@@ -2,6 +2,7 @@ package ventcore.client;
 
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.HorizontalSplitPanel;
@@ -11,13 +12,21 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ChatView extends Composite {
+	private User[] users;
+	private FlowPanel userlist;
+
 	public ChatView() {
 		MyHorizontalSplitPanel split = new MyHorizontalSplitPanel();
 		split.setMinLeftWidth(275);
 		split.setMinRightWidth(125);
 		VerticalPanel vp = new VerticalPanel();
-		HTML top = new HTML("");
+		FlowPanel top = new FlowPanel();
 		top.setStyleName("chat_view");
+		for (int i = 0; i < 100; i++) {
+			HTML msg = new HTML("&nbsp;<<< Fred is now known as Bob >>>");
+			msg.setStyleName("info");
+			top.add(msg);
+		}
 		vp.add(top);
 		HTML space = new HTML("");
 		vp.add(space);
@@ -27,12 +36,35 @@ public class ChatView extends Composite {
 		vp.setCellHeight(input, "25px");
 		vp.setSize("100%", "375px");
 		split.setLeftWidget(vp);
-		HTML users = new HTML();
-		users.setStyleName("userlist");
-		split.setRightWidget(users);
+		userlist = new FlowPanel();
+		User[] users = new User[2];
+		users[0] = new User();
+		users[0].setName("Haravikk");
+		users[1] = new User();
+		users[1].setName("WarriorMouse");
+		users[1].setAdmin(true);
+		for (int i = 2; i < users.length; i++) {
+			users[i] = new User();
+			users[i].setName("WarriorMouse");
+			users[i].setAdmin(true);
+		}
+		setUserList(users);
+		userlist.setStyleName("userlist");
+		split.setRightWidget(userlist);
 		split.setSize("100%", "375px");
 		split.setSplitPosition("525px");
 		initWidget(split);
+	}
+
+	public void setUserList(User[] users) {
+		this.users = users;
+		userlist.clear();
+		for (User user : users) {
+			String img = (user.isAdmin() ? "<img src='/images/adminuser.png'/>" : "<img src='/images/reguser.png'/>");
+			HTML userHtml = new HTML(img + "<span class='color" + user.getStatus() + "'>" + user.getName() + "</span>");
+			userHtml.setStyleName("user");
+			userlist.add(userHtml);
+		}
 	}
 
 	private Widget createChatInput() {

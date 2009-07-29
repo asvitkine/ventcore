@@ -57,6 +57,8 @@ public final class MyHorizontalSplitPanel extends SplitPanel {
       this.panel = panel;
 
       DOM.setStyleAttribute(panel.getElement(), "position", "relative");
+      DOM.setElementProperty(panel.getElement(LEFT), "className", "gwt-hsplit-left");
+      DOM.setElementProperty(panel.getElement(RIGHT), "className", "gwt-hsplit-right");
 
       expandToFitParentHorizontally(panel.getElement(LEFT));
       expandToFitParentHorizontally(panel.getElement(RIGHT));
@@ -600,8 +602,8 @@ public MyHorizontalSplitPanel() {
             + "cellspacing='0'><tr><td align='center' valign='middle'>"
             + thumbImage.getHTML());
 
-    addScrolling(leftDiv);
-    addScrolling(rightDiv);
+    //addScrolling(leftDiv);
+    //addScrolling(rightDiv);
   }
 
   private int getEndOfLinePos() {
