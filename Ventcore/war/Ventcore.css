@@ -112,7 +112,37 @@ table.hsplitter tr {
 div.userlist {
 	border: 1px solid #d4d4d4;
 	background: #fff;
-	height: 373px;
+	height: 372px;
 	overflow-y: scroll;
 }
 
+div.user {
+	cursor: pointer;
+	height: 21px;
+	line-height: 22px;
+	overflow: hidden;
+	-webkit-user-select: none;
+}
+
+div.user img {
+	display: inline;
+	margin-right: 5px;
+	margin-left: 5px;
+	margin-bottom: 1px;
+	top: -1px;
+	vertical-align: middle;
+	width: 16px;
+}
+
+div.user span {
+	font-size: 12px;
+}
+
+div.user.selected {
+	background-color: #C7D3E9;
+}
+
+.color0 { color: #000; }
+.color1 { color: #888; }
+.color2 { color: #FF0000; }
+.color3 { color: #FF8888; }
