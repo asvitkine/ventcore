@@ -6,7 +6,7 @@ import java.security.cert.*;
 import javax.net.ssl.*;
 
 public class WiredMain {
-	public static void main(String[] args) throws Exception {
+	public static WiredClient createClientFor(String host, int port) throws Exception {
 		InputStream in1 = new FileInputStream(new File("ssl_certs"));
 		KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 		ks.load(in1, "changeit".toCharArray());
@@ -18,7 +18,12 @@ public class WiredMain {
 		tmf.init(ks);
 		context.init(null, new TrustManager[] {tmf.getTrustManagers()[0]}, null);
 		SSLSocketFactory factory = context.getSocketFactory();
-	
+		SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
+		socket.setEnabledProtocols(new String[] {"TLSv1"});
+		return new WiredClient(socket.getInputStream(), socket.getOutputStream());
+	}
+
+	public static void main(String[] args) throws Exception {
 		/*
 		System.out.print("Enter host to connect to : ");
 		String host = console.readLine();
@@ -29,11 +34,7 @@ public class WiredMain {
 		String host = "localhost";
 		int port = 2000;
 	
-		SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
-		socket.setEnabledProtocols(new String[] {"TLSv1"});
-
-		WiredClient client = new WiredClient(socket.getInputStream(), socket.getOutputStream());
-		
+		WiredClient client = createClientFor(host, port);
 		BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 
 		/*
