@@ -4,7 +4,7 @@ import java.net.*;
 import java.util.*;
 import java.security.*;
 
-public class WiredClient implements Runnable {
+public class WiredClient {
 	private static final byte EOT = 4;
 	private static final byte FS = 28;
 	private static final byte GS = 29;
@@ -91,11 +91,14 @@ public class WiredClient implements Runnable {
 		msg = readServerMessage();
 		if (msg.code != 201)
 			return msg.code;
-		new Thread(this).start();
+		new Thread(new Runnable() { public void run() { processServerMessages(); } }).start();
+		final Timer timer = new Timer();
+		TimerTask tt = new TimerTask() { public void run() { try { sendPing(); } catch (IOException e) { timer.cancel(); } }};
+		timer.scheduleAtFixedRate(tt, 0, 60 * 1000);
 		return 0;
 	}
 	
-	public void run() {
+	private void processServerMessages() {
 		while (true) {
 			try {
 				ServerMessage msg = readServerMessage();
@@ -111,83 +114,83 @@ public class WiredClient implements Runnable {
 		}
 	}
 
-	public void banUser(int userId, String message) throws IOException {
+	public synchronized void banUser(int userId, String message) throws IOException {
 		send("BAN").send(SP).send(""+userId).send(FS).send(message).send(EOT);
 	}
 
-	public void requestBanner() throws IOException {
+	public synchronized void requestBanner() throws IOException {
 		send("BANNER").send(EOT);
 	}
 
-	public void broadcastMessage(String message) throws IOException {
+	public synchronized void broadcastMessage(String message) throws IOException {
 		send("BROADCAST").send(SP).send(message).send(EOT);
 	}
 
-	public void clearNews() throws IOException {
+	public synchronized void clearNews() throws IOException {
 		send("CLEARNEWS").send(EOT);
 	}
 
-	public void sendClientVersion(String clientVersion) throws IOException {
+	public synchronized void sendClientVersion(String clientVersion) throws IOException {
 		send("CLIENT").send(SP).send(clientVersion).send(EOT);
 	}
 	
-	public void setFileComment(String path, String comment) throws IOException {
+	public synchronized void setFileComment(String path, String comment) throws IOException {
 		send("COMMENT").send(SP).send(path).send(FS).send(comment).send(EOT);
 	}
 
-	public void createUser(String name, String password, String group, Object privileges) throws IOException {
+	public synchronized void createUser(String name, String password, String group, Object privileges) throws IOException {
 	// FIXME: what is privileges?
 	// send("CREATEUSER").send(SP).send(name).send(FS).send(SHA1(password)).send(FS).send(group).send(privileges).send(EOT);
 	}
 
-	public void createGroup(String name, Object privileges) throws IOException {
+	public synchronized void createGroup(String name, Object privileges) throws IOException {
 	// FIXME: what is privileges?
 	// send("CREATEGROUP").send(SP).send(name).send(FS).send(privileges).send(EOT);
 	}
 
-	public void declineInvitation(int chatId) throws IOException {
+	public synchronized void declineInvitation(int chatId) throws IOException {
 		send("DECLINE").send(SP).send(""+chatId).send(EOT);
 	}
 
-	public void deleteFile(String path) throws IOException {
+	public synchronized void deleteFile(String path) throws IOException {
 		send("DELETE").send(SP).send(path).send(EOT);
 	}
 
-	public void deleteUser(String name) throws IOException {
+	public synchronized void deleteUser(String name) throws IOException {
 		send("DELETEUSER").send(SP).send(name).send(EOT);
 	}
 
-	public void deleteGroup(String name) throws IOException {
+	public synchronized void deleteGroup(String name) throws IOException {
 		send("DELETEGROUP").send(SP).send(name).send(EOT);
 	}
 
-	public void editUser(String name, String password, String group, Object privileges) throws IOException {
+	public synchronized void editUser(String name, String password, String group, Object privileges) throws IOException {
 	// FIXME: what is privileges?
 	// send("EDITUSER").send(SP).send(name).send(FS).send(SHA1(password)).send(FS).send(group).send(privileges).send(EOT);
 	}
 
-	public void editGroup(String name, Object privileges) throws IOException {
+	public synchronized void editGroup(String name, Object privileges) throws IOException {
 	// FIXME: what is privileges?
 	// send("EDITGROUP").send(SP).send(name).send(FS).send(privileges).send(EOT);
 	}
 
-	public void createFolder(String path) throws IOException {
+	public synchronized void createFolder(String path) throws IOException {
 		send("FOLDER").send(SP).send(path).send(EOT);
 	}
 
-	public void getFile(String path, int offset) throws IOException {
+	public synchronized void getFile(String path, int offset) throws IOException {
 		send("GET").send(SP).send(path).send(FS).send(""+offset).send(EOT);
 	}
 	
-	public void requestGroupList() throws IOException {
+	public synchronized void requestGroupList() throws IOException {
 		send("GROUPS").send(EOT);
 	}
 
-	public void sendHello() throws IOException {
+	public synchronized void sendHello() throws IOException {
 		send("HELLO").send(EOT);
 	}
 	
-	public void sendIcon(int iconId, byte[] image) throws IOException {
+	public synchronized void sendIcon(int iconId, byte[] image) throws IOException {
 		send("ICON").send(SP).send(""+iconId);
 		if (image != null) {
 			send(FS).send(bytesToBase64(image));
@@ -195,120 +198,120 @@ public class WiredClient implements Runnable {
 		send(EOT);
 	}
 
-	public void requestUserInfo(int userId) throws IOException {
+	public synchronized void requestUserInfo(int userId) throws IOException {
 		send("INFO").send(SP).send(""+userId).send(EOT);
 	}
 	
-	public void inviteToChat(int userId, int charId) throws IOException {
+	public synchronized void inviteToChat(int userId, int charId) throws IOException {
 		send("INVITE").send(SP).send(""+userId).send(FS).send(EOT);
 	}
 
-	public void joinChat(int chatId) throws IOException {
+	public synchronized void joinChat(int chatId) throws IOException {
 		send("JOIN").send(SP).send(""+chatId).send(EOT);
 	}
 
-	public void kickUser(int userId, String message) throws IOException {
+	public synchronized void kickUser(int userId, String message) throws IOException {
 		send("KICK").send(SP).send(""+userId).send(FS).send(message).send(EOT);
 	}
 
-	public void leaveChat(int chatId) throws IOException {
+	public synchronized void leaveChat(int chatId) throws IOException {
 		send("LEAVE").send(SP).send(""+chatId).send(EOT);
 	}
 
-	public void requestFileList(String path) throws IOException {
+	public synchronized void requestFileList(String path) throws IOException {
 		send("LIST").send(SP).send(path).send(EOT);
 	}
 	
-	public void sendEmoteMessage(int chatId, String message) throws IOException {
+	public synchronized void sendEmoteMessage(int chatId, String message) throws IOException {
 		send("ME").send(SP).send(""+chatId).send(FS).send(message).send(EOT);
 	}
 
-	public void moveFile(String from, String to) throws IOException {
+	public synchronized void moveFile(String from, String to) throws IOException {
 		send("MOVE").send(SP).send(from).send(FS).send(to).send(EOT);
 	}
 	
-	public void sendPrivateMessage(int userId, String message) throws IOException {
+	public synchronized void sendPrivateMessage(int userId, String message) throws IOException {
 		send("MSG").send(SP).send(""+userId).send(FS).send(message).send(EOT);
 	}
 
-	public void requestNews() throws IOException {
+	public synchronized void requestNews() throws IOException {
 		send("NEWS").send(EOT);
 	}
 
-	public void sendNick(String nick) throws IOException {
+	public synchronized void sendNick(String nick) throws IOException {
 		send("NICK").send(SP).send(nick).send(EOT);
 	}
 
-	public void sendPassword(String password) throws IOException {
+	public synchronized void sendPassword(String password) throws IOException {
 		send("PASS").send(SP).send((password != null ? SHA1(password) : "")).send(EOT);
 	}
 
-	public void sendPing() throws IOException {
+	public synchronized void sendPing() throws IOException {
 		send("PING").send(EOT);
 	}
 
-	public void postNews(String message) throws IOException {
+	public synchronized void postNews(String message) throws IOException {
 		send("POST").send(SP).send(message).send(EOT);
 	}
 
-	public void createPrivateChat() throws IOException {
+	public synchronized void createPrivateChat() throws IOException {
 		send("PRIVCHAT").send(EOT);
 	}
 
-	public void requestPrivilegeMask() throws IOException {
+	public synchronized void requestPrivilegeMask() throws IOException {
 		send("PRIVILEGES").send(EOT);
 	}
 
-	public void putFile(String path, int size, String checksum) throws IOException {
+	public synchronized void putFile(String path, int size, String checksum) throws IOException {
 		send("PUT").send(SP).send(path).send(FS).send(""+size).send(FS).send(checksum).send(EOT);
 	}
 
-	public void readUserInfo(String name) throws IOException {
+	public synchronized void readUserInfo(String name) throws IOException {
 		send("READUSER").send(SP).send(name).send(EOT);
 	}
 
-	public void readGroupInfo(String name) throws IOException {
+	public synchronized void readGroupInfo(String name) throws IOException {
 		send("READGROUP").send(SP).send(name).send(EOT);
 	}
 
-	public void sendChatMessage(int chatId, String message) throws IOException {
+	public synchronized void sendChatMessage(int chatId, String message) throws IOException {
 		send("SAY").send(SP).send(""+chatId).send(FS).send(message).send(EOT);
 	}
 
-	public void searchFor(String query) throws IOException {
+	public synchronized void searchFor(String query) throws IOException {
 		send("SEARCH").send(SP).send(query).send(EOT);
 	}
 	
-	public void requestFileInfo(String path) throws IOException {
+	public synchronized void requestFileInfo(String path) throws IOException {
 		send("STAT").send(SP).send(path).send(EOT);
 	}
 	
-	public void sendStatusMessage(String status) throws IOException {
+	public synchronized void sendStatusMessage(String status) throws IOException {
 		send("STATUS").send(SP).send(status).send(EOT);
 	}
 	
-	public void changeTopic(int chatId, String topic) throws IOException {
+	public synchronized void changeTopic(int chatId, String topic) throws IOException {
 		send("TOPIC").send(SP).send(""+chatId).send(FS).send(topic).send(EOT);
 	}
 
-	public void identifyTransfer(String hash) throws IOException {
+	public synchronized void identifyTransfer(String hash) throws IOException {
 		send("TRANSFER").send(SP).send(hash).send(EOT);
 	}
 	
-	public void sendFolderType(String path, Object folderType) {
+	public synchronized void sendFolderType(String path, Object folderType) {
 		// FIXME - folderType
 		// send("TYPE").send(SP).send(path).send(folderType).send(EOT);
 	}
 
-	public void sendUsername(String username) throws IOException {
+	public synchronized void sendUsername(String username) throws IOException {
 		send("USER").send(SP).send(username).send(EOT);
 	}
 
-	public void listUserAccounts() throws IOException {
+	public synchronized void listUserAccounts() throws IOException {
 		send("USERS").send(EOT);
 	}
 
-	public void requestUserList(int chatId) throws IOException {
+	public synchronized void requestUserList(int chatId) throws IOException {
 		send("WHO").send(SP).send(""+chatId).send(EOT);
 	}
 
