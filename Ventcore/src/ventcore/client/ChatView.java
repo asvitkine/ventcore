@@ -1,5 +1,9 @@
 package ventcore.client;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -69,17 +73,29 @@ public class ChatView extends Composite {
 
 	private Widget createChatInput() {
 		HorizontalPanel panel = new HorizontalPanel();
-		TextBox field = new TextBox();
+		final TextBox field = new TextBox();
 		field.setWidth("100%");
 		panel.add(field);
 		HTML space = new HTML("&nbsp;");
 		panel.add(space);
 		panel.setCellWidth(space, "5px");
-		Button button = new Button("Send");
+		final Button button = new Button("Send");
+		button.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				field.setText("");
+			}
+		});
 		button.setWidth("100%");
 		panel.add(button);
 		panel.setCellWidth(button, "65px");
 		panel.setWidth("100%");
+		field.addKeyPressHandler(new KeyPressHandler() {
+			public void onKeyPress(KeyPressEvent event) {
+				if (event.getCharCode() == '\r') {
+					button.click();
+				}
+			}
+		});
 		return panel;
 	}
 }
