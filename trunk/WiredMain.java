@@ -7,10 +7,11 @@ import javax.net.ssl.*;
 
 public class WiredMain {
 	public static WiredClient createClientFor(String host, int port) throws Exception {
-		InputStream in1 = new FileInputStream(new File("ssl_certs"));
+		File certificatesFile = new File("ssl_certs");
+		InputStream in = new FileInputStream(certificatesFile);
 		KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-		ks.load(in1, "changeit".toCharArray());
-		in1.close();
+		ks.load(in, "changeit".toCharArray());
+		in.close();
 
 		SSLContext context = SSLContext.getInstance("TLS");
 		String algorithm = TrustManagerFactory.getDefaultAlgorithm();
