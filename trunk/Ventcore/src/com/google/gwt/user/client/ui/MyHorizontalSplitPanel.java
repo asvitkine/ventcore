@@ -159,6 +159,7 @@ public final class MyHorizontalSplitPanel extends SplitPanel {
   /**
    * The IE6 implementation for horizontal split panels.
    */
+  @SuppressWarnings("unused")
   private static class ImplIE6 extends Impl {
 
     private boolean isResizeInProgress = false;
@@ -315,6 +316,7 @@ public final class MyHorizontalSplitPanel extends SplitPanel {
    * The Safari implementation which owes its existence entirely to a single
    * WebKit bug: http://bugs.webkit.org/show_bug.cgi?id=9137.
    */
+  @SuppressWarnings("unused")
   private static class ImplSafari extends Impl {
     @Override
     public void init(MyHorizontalSplitPanel panel) {
