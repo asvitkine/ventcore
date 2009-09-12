@@ -9,14 +9,13 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.HorizontalSplitPanel;
 import com.google.gwt.user.client.ui.MyHorizontalSplitPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ChatView extends Composite {
-	private User[] users;
+	private FlowPanel messageList;
 	private FlowPanel userlist;
 
 	public ChatView() {
@@ -24,14 +23,11 @@ public class ChatView extends Composite {
 		split.setMinLeftWidth(275);
 		split.setMinRightWidth(125);
 		VerticalPanel vp = new VerticalPanel();
-		FlowPanel top = new FlowPanel();
-		top.setStyleName("chat_view");
-		for (int i = 0; i < 100; i++) {
-			HTML msg = new HTML("&nbsp;<<< Fred is now known as Bob >>>");
-			msg.setStyleName("info");
-			top.add(msg);
-		}
-		vp.add(top);
+		messageList = new FlowPanel();
+		messageList.setStyleName("chat_view");
+		for (int i = 0; i < 100; i++)
+			appendMessage("&nbsp;<<< Fred is now known as Bob >>>");
+		vp.add(messageList);
 		HTML space = new HTML("");
 		vp.add(space);
 		vp.setCellHeight(space, "5px");
@@ -41,6 +37,15 @@ public class ChatView extends Composite {
 		vp.setSize("100%", "375px");
 		split.setLeftWidget(vp);
 		userlist = new FlowPanel();
+		setUserList(createSampleUserList());
+		userlist.setStyleName("userlist");
+		split.setRightWidget(userlist);
+		split.setSize("100%", "375px");
+		split.setSplitPosition("525px");
+		initWidget(split);
+	}
+
+	private User[] createSampleUserList() {
 		User[] users = new User[2];
 		users[0] = new User();
 		users[0].setName("Haravikk");
@@ -52,16 +57,16 @@ public class ChatView extends Composite {
 			users[i].setName("WarriorMouse");
 			users[i].setAdmin(true);
 		}
-		setUserList(users);
-		userlist.setStyleName("userlist");
-		split.setRightWidget(userlist);
-		split.setSize("100%", "375px");
-		split.setSplitPosition("525px");
-		initWidget(split);
+		return users;
+	}
+	
+	public void appendMessage(String message) {
+		HTML msg = new HTML(message);
+		msg.setStyleName("info");
+		messageList.add(msg);
 	}
 
 	public void setUserList(User[] users) {
-		this.users = users;
 		userlist.clear();
 		for (User user : users) {
 			String img = (user.isAdmin() ? "<img src='/images/adminuser.png'/>" : "<img src='/images/reguser.png'/>");
