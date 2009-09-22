@@ -7,7 +7,7 @@ import javax.net.ssl.*;
 
 public class WiredMain {
 	public static WiredClient createClientFor(String host, int port) throws Exception {
-		File certificatesFile = new File("ssl_certs");
+		File certificatesFile = new File("/Users/shadowknight/Projects/ventcore/ssl_certs");
 		InputStream in = new FileInputStream(certificatesFile);
 		KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 		ks.load(in, "changeit".toCharArray());
@@ -21,7 +21,16 @@ public class WiredMain {
 		SSLSocketFactory factory = context.getSocketFactory();
 		SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
 		socket.setEnabledProtocols(new String[] {"TLSv1"});
-		return new WiredClient(socket.getInputStream(), socket.getOutputStream());
+		return new WiredClient(socket.getInputStream(), socket.getOutputStream()) {
+			protected void processServerMessage(int code, List<String> params) {
+				System.out.println("Got " + code);
+				if (params != null) {
+					System.out.println("With params: ");
+					for (String p : params)
+						System.out.println("  " + p);
+				}
+			}
+		};
 	}
 
 	public static void main(String[] args) throws Exception {

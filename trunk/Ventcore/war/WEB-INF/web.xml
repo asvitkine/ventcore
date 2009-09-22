@@ -4,21 +4,31 @@
     "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-  
-  <!-- Servlets -->
-  <servlet>
-    <servlet-name>chatServlet</servlet-name>
-    <servlet-class>ventcore.server.ChatServiceImpl</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>chatServlet</servlet-name>
-    <url-pattern>/ventcore/chat</url-pattern>
-  </servlet-mapping>
-  
-  <!-- Default page to serve -->
-  <welcome-file-list>
-    <welcome-file>Ventcore.html</welcome-file>
-  </welcome-file-list>
+
+	<!-- Servlets -->
+	<servlet>
+		<servlet-name>ventcoreServlet</servlet-name>
+		<servlet-class>ventcore.server.VentcoreServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>ventcoreServlet</servlet-name>
+		<url-pattern>/ventcore/chat</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>eventsServlet</servlet-name>
+		<servlet-class>ventcore.server.EventServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>eventsServlet</servlet-name>
+		<url-pattern>/ventcore/events</url-pattern>
+	</servlet-mapping>
+
+	<!-- Default page to serve -->
+	<welcome-file-list>
+		<welcome-file>Ventcore.html</welcome-file>
+	</welcome-file-list>
 
 </web-app>

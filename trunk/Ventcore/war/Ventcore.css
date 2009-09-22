@@ -94,11 +94,19 @@ div#navigation ul li:hover {
     background-image: url(/images/hover.png);
 }
 
-div.chat_view {
+div.chat_scroll_view {
 	border: 1px solid #d4d4d4;
 	background: #fff;
 	height:100%;
-	overflow-y: scroll;
+}
+
+div.chat_view {
+	background: #fff;
+	height:100%;
+}
+
+div.gwt-hsplitter {
+	cursor: col-resize;
 }
 
 table.hsplitter {

@@ -2,10 +2,11 @@ package ventcore.client;
 
 import java.io.Serializable;
 
-@SuppressWarnings("serial")
 public class User implements Serializable {
 	private int id;
-	private String name;
+	private String nick;
+	private String login;
+	private boolean idle;
 	private boolean admin;
 	private int status;
 
@@ -14,6 +15,18 @@ public class User implements Serializable {
 	}
 	public void setAdmin(boolean admin) {
 		this.admin = admin;
+	}
+	public boolean isIdle() {
+		return idle;
+	}
+	public void setIdle(boolean idle) {
+		this.idle = idle;
+	}
+	public String getLogin() {
+		return login;
+	}
+	public void setLogin(String login) {
+		this.login = login;
 	}
 	public int getStatus() {
 		return status;
@@ -27,10 +40,10 @@ public class User implements Serializable {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public String getName() {
-		return name;
+	public String getNick() {
+		return nick;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setNick(String nick) {
+		this.nick = nick;
 	}
 }
