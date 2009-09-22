@@ -59,6 +59,7 @@ public final class MyHorizontalSplitPanel extends SplitPanel {
       DOM.setStyleAttribute(panel.getElement(), "position", "relative");
       DOM.setElementProperty(panel.getElement(LEFT), "className", "gwt-hsplit-left");
       DOM.setElementProperty(panel.getElement(RIGHT), "className", "gwt-hsplit-right");
+      DOM.setElementProperty(panel.getSplitElement(), "className", "gwt-hsplitter");
 
       expandToFitParentHorizontally(panel.getElement(LEFT));
       expandToFitParentHorizontally(panel.getElement(RIGHT));
