@@ -20,7 +20,7 @@ public class UserManager {
 		synchronized (users) {
 			d = users.get(user);
 			if (d == null) {
-				d = new UserData(user);
+				d = new UserData();
 				users.put(user, d);
 			}
 		}
