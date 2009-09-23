@@ -7,7 +7,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("chat")
 public interface VentcoreService extends RemoteService {
-	User[] login(LoginInfo login);
+	public void login(String user, LoginInfo login);
 	public void banUser(String user, int userId, String message) throws IOException;
 	public void broadcastMessage(String user, String message) throws IOException;
 	public void clearNews(String user) throws IOException;

@@ -3,7 +3,8 @@ package ventcore.client;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface VentcoreServiceAsync {
-	void login(LoginInfo login, AsyncCallback<User[]> async);
+	void login(String user, LoginInfo login,
+			AsyncCallback<Void> async);
 
 	void banUser(String user, int userId, String message,
 			AsyncCallback<Void> callback);

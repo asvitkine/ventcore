@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 
 public class Ventcore implements EntryPoint {
 	private static final String userKey = generateRandomString();
-	private static final VentcoreServiceAsync chatService = GWT.create(VentcoreService.class);
+	private static final VentcoreServiceAsync ventcoreService = GWT.create(VentcoreService.class);
 	private static final EventServiceAsync eventService = GWT.create(EventService.class);
 	private static final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 		public void onFailure(Throwable caught) {}
@@ -29,19 +29,9 @@ public class Ventcore implements EntryPoint {
 		Keyboard.init();
 		createNavLinks();
 		RootPanel.get("content").add(new ChatView());
-		chatService.login(null, new AsyncCallback<User[]>() {
-
-			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			public void onSuccess(User[] result) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-		});
+		LoginDialog dialog = new LoginDialog();
+		dialog.center();
+		dialog.show();
 	}
 
 	private void createNavLinks() {
@@ -56,8 +46,8 @@ public class Ventcore implements EntryPoint {
 		return userKey;
 	}
 	
-	public static VentcoreServiceAsync getChatService() {
-		return chatService;
+	public static VentcoreServiceAsync getVentcoreService() {
+		return ventcoreService;
 	}
 
 	public static EventServiceAsync getEventService() {
@@ -65,10 +55,14 @@ public class Ventcore implements EntryPoint {
 	}
 
 	public static void sendChatMessage(int chatId, String message) {
-		chatService.sendChatMessage(userKey, chatId, message, callback);
+		ventcoreService.sendChatMessage(userKey, chatId, message, callback);
 	}
 
 	public static void sendEmoteMessage(int chatId, String message) {
-		chatService.sendEmoteMessage(userKey, chatId, message, callback);		
+		ventcoreService.sendEmoteMessage(userKey, chatId, message, callback);		
+	}
+
+	public static void login(LoginInfo loginInfo) {
+		ventcoreService.login(userKey, loginInfo, callback);		
 	}
 }

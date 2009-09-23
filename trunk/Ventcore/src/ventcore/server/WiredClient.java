@@ -77,15 +77,21 @@ public abstract class WiredClient {
 		this.out = out;
 	}
 
+	private String subst(String defaultString, String argument) {
+		if (argument != null && argument.length() > 0)
+			return argument;
+		return defaultString;
+	}
+	
 	public int login(String nick, String user, String pass) throws IOException {
 		ServerMessage msg;
 		sendHello();
 		msg = readServerMessage();
 		if (msg.code != 200)
 			return msg.code;
-		sendNick(nick);
-		sendUsername(user);
-		sendPassword(pass);
+		sendNick(subst("Ventcore User", nick));
+		sendUsername(subst("guest", user));
+		sendPassword(subst(null, pass));
 		msg = readServerMessage();
 		if (msg.code != 201)
 			return msg.code;
@@ -310,12 +316,12 @@ public abstract class WiredClient {
 		send("WHO").send(SP).send(""+chatId).send(EOT);
 	}
 
-	private WiredClient send(String str) throws IOException {
+	protected WiredClient send(String str) throws IOException {
 		out.write(str.getBytes("UTF-8"));
 		return this;
 	}
 
-	private WiredClient send(byte b) throws IOException {
+	protected WiredClient send(byte b) throws IOException {
 		out.write(b);
 		return this;
 	}
