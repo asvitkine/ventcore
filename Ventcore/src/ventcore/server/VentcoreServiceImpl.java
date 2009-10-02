@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
@@ -195,7 +196,7 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 		SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
 		socket.setEnabledProtocols(new String[] {"TLSv1"});
 		return new WiredClient(socket.getInputStream(), socket.getOutputStream()) {
-			List<User> users = new ArrayList<User>();
+			HashMap<Integer,List<User>> users = new HashMap<Integer,List<User>>();
 			protected void processServerMessage(int code, List<String> params) {
 				System.out.println("Got " + code);
 				if (params != null) {
@@ -211,21 +212,29 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 					event.setEmote(code == WiredClient.MSG_ACTION_CHAT);
 					EventDispatcher.getInstance().dispatch(event, user);
 				} else if (code == WiredClient.MSG_USERLIST) {
-					// FIXME: userlists for different chats (first param)
-					users.add(readUser(params));
+					int chatId = Integer.valueOf(params.get(0));
+					List<User> userlist = users.get(chatId);
+					if (userlist == null) {
+						userlist = new ArrayList<User>();
+						users.put(chatId, userlist);
+					}
+					userlist.add(readUser(params));
 				} else if (code == WiredClient.MSG_USERLIST_DONE) {
-					UserListEvent event = new UserListEvent();
-					event.setUsers(users);
-					EventDispatcher.getInstance().dispatch(event, user);					
-					users = new ArrayList<User>();
+					int chatId = Integer.valueOf(params.get(0));
+					List<User> userlist = users.get(chatId);
+					if (userlist != null) {
+						UserListEvent event = new UserListEvent();
+						event.setChatId(chatId);
+						event.setUsers(userlist);
+						EventDispatcher.getInstance().dispatch(event, user);
+						users.remove(chatId);
+					}
 				} else if (code == WiredClient.MSG_CLIENT_JOIN) {
-					// TODO chatid
 					UserJoinEvent event = new UserJoinEvent();
+					event.setChatId(Integer.valueOf(params.get(0)));
 					event.setUser(readUser(params));
 					EventDispatcher.getInstance().dispatch(event, user);					
 				} else if (code == WiredClient.MSG_CLIENT_LEAVE) {
-					// TODO chatid
-					// TODO chatid
 					UserLeaveEvent event = new UserLeaveEvent();
 					event.setChatId(Integer.valueOf(params.get(0)));
 					event.setUserId(Integer.valueOf(params.get(1)));

@@ -7,6 +7,7 @@ import javax.net.ssl.*;
 
 public class WiredMain {
 	public static WiredClient createClientFor(String host, int port) throws Exception {
+		// http://www.coderanch.com/t/133048/Security/do-programmatically-create-keystore-import
 		File certificatesFile = new File("/Users/shadowknight/Projects/ventcore/ssl_certs");
 		InputStream in = new FileInputStream(certificatesFile);
 		KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
