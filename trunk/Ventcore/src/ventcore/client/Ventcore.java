@@ -1,5 +1,7 @@
 package ventcore.client;
 
+import java.util.List;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -81,5 +83,10 @@ public class Ventcore implements EntryPoint {
 	
 	public static void login(LoginInfo loginInfo) {
 		ventcoreService.login(userKey, loginInfo, callback);		
+	}
+
+	public static void handleFileList(List<FileInfo> files) {
+		RootPanel.get("content").clear();
+		RootPanel.get("content").add(new FolderView(files));
 	}
 }
