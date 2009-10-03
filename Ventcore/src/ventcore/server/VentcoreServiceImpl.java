@@ -17,10 +17,12 @@ import javax.net.ssl.TrustManagerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
+import ventcore.client.FileInfo;
 import ventcore.client.VentcoreService;
 import ventcore.client.LoginInfo;
 import ventcore.client.User;
 import ventcore.client.event.ChatEvent;
+import ventcore.client.event.FileListEvent;
 import ventcore.client.event.UserJoinEvent;
 import ventcore.client.event.UserLeaveEvent;
 import ventcore.client.event.UserListEvent;
@@ -197,6 +199,7 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 		socket.setEnabledProtocols(new String[] {"TLSv1"});
 		return new WiredClient(socket.getInputStream(), socket.getOutputStream()) {
 			HashMap<Integer,List<User>> users = new HashMap<Integer,List<User>>();
+			ArrayList<FileInfo> files = new ArrayList<FileInfo>();
 			protected void processServerMessage(int code, List<String> params) {
 				System.out.println("Got " + code);
 				if (params != null) {
@@ -239,9 +242,31 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 					event.setChatId(Integer.valueOf(params.get(0)));
 					event.setUserId(Integer.valueOf(params.get(1)));
 					EventDispatcher.getInstance().dispatch(event, user);	
+				} else if (code == WiredClient.MSG_FILE_LISTING) {
+					files.add(readFile(params));
+				} else if (code == WiredClient.MSG_FILE_LISTING_DONE) {
+					FileListEvent event = new FileListEvent();
+					event.setFiles(files);
+					EventDispatcher.getInstance().dispatch(event, user);
 				}
 			}
 		};
+	}
+
+	private static long parseDate(String dateString) {
+		System.out.println(dateString);
+		System.out.println(ISO8601.parse(dateString).toString());
+		return ISO8601.parse(dateString).getTimeInMillis();
+	}
+
+	private static FileInfo readFile(List<String> params) {
+		FileInfo file = new FileInfo();
+		file.setPath(params.get(0));
+		file.setType(Integer.valueOf(params.get(1)));		
+		file.setSize(Integer.valueOf(params.get(2)));
+		file.setCreationDate(parseDate(params.get(3)));
+		file.setModificationDate(parseDate(params.get(4)));
+		return file;
 	}
 	
 	private static User readUser(List<String> params) {
