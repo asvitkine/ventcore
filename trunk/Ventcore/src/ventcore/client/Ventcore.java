@@ -2,6 +2,8 @@ package ventcore.client;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -35,11 +37,22 @@ public class Ventcore implements EntryPoint {
 	}
 
 	private void createNavLinks() {
-		RootPanel.get("nav_chat").add(new HTML("<a href='javascript:;'>Chat</a>"));
-		RootPanel.get("nav_private").add(new HTML("<a href='javascript:;'>Private</a>"));
-		RootPanel.get("nav_files").add(new HTML("<a href='javascript:;'>Files</a>"));
-		RootPanel.get("nav_news").add(new HTML("<a href='javascript:;'>News</a>"));
-		RootPanel.get("nav_connection").add(new HTML("<a href='javascript:;'>Disconnect</a>"));
+		createNavLink("nav_chat", "<a href='javascript:;'>Chat</a>");
+		createNavLink("nav_private", "<a href='javascript:;'>Private</a>");
+		createNavLink("nav_files", "<a href='javascript:;'>Files</a>").addClickHandler(
+			new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					Ventcore.requestFileList("/");
+				}
+			});
+		createNavLink("nav_news", "<a href='javascript:;'>News</a>");
+		createNavLink("nav_connection", "<a href='javascript:;'>Disconnect</a>");
+	}
+	
+	private HTML createNavLink(String name, String content) {
+		HTML link = new HTML(content);
+		RootPanel.get(name).add(link);
+		return link;
 	}
 
 	public static String getUserKey() {
@@ -62,6 +75,10 @@ public class Ventcore implements EntryPoint {
 		ventcoreService.sendEmoteMessage(userKey, chatId, message, callback);		
 	}
 
+	public static void requestFileList(String path) {
+		ventcoreService.requestFileList(userKey, path, callback);		
+	}
+	
 	public static void login(LoginInfo loginInfo) {
 		ventcoreService.login(userKey, loginInfo, callback);		
 	}
