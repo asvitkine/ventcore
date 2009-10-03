@@ -9,11 +9,18 @@ public class FileInfo implements Serializable {
 	public static final int TYPE_DROPBOX_FOLDER = 3;
 
 	private String path;
+	private String name;
 	private int type;
 	private long size;
 	private long creationDate;
 	private long modificationDate;
 
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	public String getPath() {
 		return path;
 	}
@@ -25,6 +32,9 @@ public class FileInfo implements Serializable {
 	}
 	public void setType(int type) {
 		this.type = type;
+	}
+	public boolean isDirectory() {
+		return type != TYPE_FILE;
 	}
 	public long getSize() {
 		return size;

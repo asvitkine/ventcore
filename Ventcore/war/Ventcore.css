@@ -155,3 +155,28 @@ div.user.selected {
 .color1 { color: #888; }
 .color2 { color: #FF0000; }
 .color3 { color: #FF8888; }
+
+/* file-list */
+
+.list {
+	border-collapse: collapse;
+	background: white;
+	border:1px solid #aaa;
+	width: 100%;
+}
+
+.list td {
+	height: 21px;
+	vertical-align: center;
+}
+
+.list tr.th td {
+	padding: 0 0 0 12px;
+	margin: 0;
+	height: 20px;
+	background: #ccc;
+	text-align: left;
+	background: url(/images/th.png) repeat-x;
+	border-bottom: 1px solid #ccc;
+	font-weight: bold;
+}

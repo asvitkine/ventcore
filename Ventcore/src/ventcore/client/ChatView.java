@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ventcore.client.event.ChatEvent;
+import ventcore.client.event.FileListEvent;
 import ventcore.client.event.RemoteEvent;
 import ventcore.client.event.UserJoinEvent;
 import ventcore.client.event.UserLeaveEvent;
@@ -66,6 +67,8 @@ public class ChatView extends Composite {
 							} else if (e instanceof UserLeaveEvent) {
 								// TODO chatid
 								handleUserLeave(getUser(((UserLeaveEvent)e).getUserId()));
+							} else if (e instanceof FileListEvent) {
+								Ventcore.handleFileList(((FileListEvent)e).getFiles());
 							}
 						}
 						schedule(1);

@@ -247,6 +247,7 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 				} else if (code == WiredClient.MSG_FILE_LISTING_DONE) {
 					FileListEvent event = new FileListEvent();
 					event.setFiles(files);
+					files = new ArrayList<FileInfo>();
 					EventDispatcher.getInstance().dispatch(event, user);
 				}
 			}
@@ -262,6 +263,7 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 	private static FileInfo readFile(List<String> params) {
 		FileInfo file = new FileInfo();
 		file.setPath(params.get(0));
+		file.setName(new File(params.get(0)).getName());
 		file.setType(Integer.valueOf(params.get(1)));		
 		file.setSize(Integer.valueOf(params.get(2)));
 		file.setCreationDate(parseDate(params.get(3)));
