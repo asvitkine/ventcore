@@ -278,6 +278,8 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 		user.setAdmin(Boolean.valueOf(params.get(3)));
 		user.setNick(params.get(5));
 		user.setLogin(params.get(6));
+		if (params.size() > 9)
+			user.setImage(params.get(9));
 		return user;
 	}
 }

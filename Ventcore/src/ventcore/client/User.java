@@ -9,7 +9,14 @@ public class User implements Serializable {
 	private boolean idle;
 	private boolean admin;
 	private int status;
+	private String image;
 
+	public String getImage() {
+		return image;
+	}
+	public void setImage(String image) {
+		this.image = image;
+	}
 	public boolean isAdmin() {
 		return admin;
 	}
