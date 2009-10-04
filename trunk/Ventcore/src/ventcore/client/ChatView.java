@@ -4,24 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ventcore.client.event.ChatEvent;
-import ventcore.client.event.FileListEvent;
-import ventcore.client.event.RemoteEvent;
-import ventcore.client.event.UserJoinEvent;
-import ventcore.client.event.UserLeaveEvent;
-import ventcore.client.event.UserListEvent;
 
 import com.google.gwt.event.dom.client.*;
-import com.google.gwt.user.client.*;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 
 public class ChatView extends Composite {
+	private int chatId;
 	private ScrollPanel messageScrollPanel;
 	private FlowPanel messageList;
 	private FlowPanel userlist;
 	private List<User> users;
 
-	public ChatView() {
+	public ChatView(int chatId) {
 		users = new ArrayList<User>();
 		MyHorizontalSplitPanel split = new MyHorizontalSplitPanel();
 		split.setMinLeftWidth(275);
@@ -46,42 +40,9 @@ public class ChatView extends Composite {
 		split.setSize("100%", "375px");
 		split.setSplitPosition("525px");
 		initWidget(split);
-		Timer t = new Timer() {
-			public void run() {
-				Ventcore.getEventService().receiveEvents(Ventcore.getUserKey(), new AsyncCallback<List<RemoteEvent>>() {
-
-					public void onFailure(Throwable caught) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					public void onSuccess(List<RemoteEvent> result) {
-						for (RemoteEvent e : result) {
-							if (e instanceof ChatEvent) {
-								handleChatEvent((ChatEvent) e);
-							} else if (e instanceof UserListEvent) {
-								setUserList(((UserListEvent) e).getUsers());
-							} else if (e instanceof UserJoinEvent) {
-								// TODO chatid
-								handleUserJoin(((UserJoinEvent)e).getUser());
-							} else if (e instanceof UserLeaveEvent) {
-								// TODO chatid
-								handleUserLeave(getUser(((UserLeaveEvent)e).getUserId()));
-							} else if (e instanceof FileListEvent) {
-								Ventcore.handleFileList(((FileListEvent)e).getFiles());
-							}
-						}
-						schedule(1);
-					}				
-				});
-			}
-		};
-		t.run();
-		t.schedule(1);
 	}
 
-
-	private void handleUserLeave(User user) {
+	public void handleUserLeave(User user) {
 		if (user != null) {
 			users.remove(user);
 			setUserList(users);
@@ -90,7 +51,7 @@ public class ChatView extends Composite {
 		}
 	}
 
-	private void handleUserJoin(User user) {
+	public void handleUserJoin(User user) {
 		users.add(user);
 		setUserList(users);
 		appendMessage("<font color='red'>&lt;&lt;&lt; " +
@@ -126,7 +87,14 @@ public class ChatView extends Composite {
 		this.users = users;
 		userlist.clear();
 		for (User user : users) {
-			String img = (user.isAdmin() ? "<img src='/images/adminuser.png'/>" : "<img src='/images/reguser.png'/>");
+			String img;
+			if (user.getImage() != null) {
+				img = "<img src='data:image;base64," + user.getImage() + "' />";
+			} else if (user.isAdmin()) {
+				img = "<img src='/images/adminuser.png'/>";
+			} else {
+				img = "<img src='/images/reguser.png'/>";
+			}
 			HTML userHtml = new HTML(img + "<span class='color" + user.getStatus() + "'>" + user.getNick() + "</span>");
 			userHtml.setStyleName("user");
 			userlist.add(userHtml);
@@ -163,5 +131,9 @@ public class ChatView extends Composite {
 			}
 		});
 		return panel;
+	}
+
+	public int getChatId() {
+		return chatId;
 	}
 }

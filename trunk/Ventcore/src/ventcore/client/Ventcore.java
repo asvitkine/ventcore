@@ -1,16 +1,27 @@
 package ventcore.client;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import ventcore.client.event.ChatEvent;
+import ventcore.client.event.FileListEvent;
+import ventcore.client.event.RemoteEvent;
+import ventcore.client.event.UserJoinEvent;
+import ventcore.client.event.UserLeaveEvent;
+import ventcore.client.event.UserListEvent;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Random;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 public class Ventcore implements EntryPoint {
 	private static final String userKey = generateRandomString();
@@ -20,6 +31,8 @@ public class Ventcore implements EntryPoint {
 		public void onFailure(Throwable caught) {}
 		public void onSuccess(Void result) {}
 	};
+	private Map<Integer, ChatView> chats;
+	private static int lastChatId = 1;
 
 	private static String generateRandomString() {
 		StringBuilder sb = new StringBuilder();
@@ -32,14 +45,66 @@ public class Ventcore implements EntryPoint {
 		Window.enableScrolling(false);
 		Keyboard.init();
 		createNavLinks();
-		RootPanel.get("content").add(new ChatView());
+		chats = new HashMap<Integer, ChatView>();
+		ChatView cv = new ChatView(1);
+		chats.put(1, cv);
+		RootPanel.get("content").add(cv);
 		LoginDialog dialog = new LoginDialog();
 		dialog.center();
 		dialog.show();
+		runTimer();
+	}
+
+	private void runTimer() {
+		Timer t = new Timer() {
+			public void run() {
+				Ventcore.getEventService().receiveEvents(Ventcore.getUserKey(), new AsyncCallback<List<RemoteEvent>>() {
+
+					public void onFailure(Throwable caught) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					public void onSuccess(List<RemoteEvent> result) {
+						for (RemoteEvent e : result) {
+							if (e instanceof ChatEvent) {
+								ChatEvent event = (ChatEvent) e;
+								chats.get(event.getChatId()).handleChatEvent(event);
+							} else if (e instanceof UserListEvent) {
+								UserListEvent event = (UserListEvent) e;
+								chats.get(event.getChatId()).setUserList(event.getUsers());
+							} else if (e instanceof UserJoinEvent) {
+								UserJoinEvent event = (UserJoinEvent) e;
+								chats.get(event.getChatId()).handleUserJoin(event.getUser());
+							} else if (e instanceof UserLeaveEvent) {
+								UserLeaveEvent event = (UserLeaveEvent) e;
+								ChatView cv = chats.get(event.getChatId());
+								cv.handleUserLeave(cv.getUser(event.getUserId()));
+							} else if (e instanceof FileListEvent) {
+								Ventcore.handleFileList(((FileListEvent)e).getFiles());
+							}
+						}
+						schedule(1);
+					}				
+				});
+			}
+		};
+		t.run();
+		t.schedule(1);
 	}
 
 	private void createNavLinks() {
-		createNavLink("nav_chat", "<a href='javascript:;'>Chat</a>");
+		createNavLink("nav_chat", "<a href='javascript:;'>Chat</a>").addClickHandler(
+			new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					ChatView cv = chats.get(lastChatId);
+					if (cv == null) {
+						cv = chats.get(1);
+					}
+					RootPanel.get("content").clear();
+					RootPanel.get("content").add(cv);
+				}
+			});
 		createNavLink("nav_private", "<a href='javascript:;'>Private</a>");
 		createNavLink("nav_files", "<a href='javascript:;'>Files</a>").addClickHandler(
 			new ClickHandler() {
@@ -85,8 +150,19 @@ public class Ventcore implements EntryPoint {
 		ventcoreService.login(userKey, loginInfo, callback);		
 	}
 
+	public static void setContent(Widget w) {
+		RootPanel rp = RootPanel.get("content");
+		if (rp.getWidgetCount() > 0) {
+			Widget old = rp.getWidget(0);
+			if (old instanceof ChatView) {
+				lastChatId = ((ChatView)old).getChatId();
+			}
+			rp.clear();
+		}
+		rp.add(w);
+	}
+
 	public static void handleFileList(List<FileInfo> files) {
-		RootPanel.get("content").clear();
-		RootPanel.get("content").add(new FolderView(files));
+		setContent(new FolderView(files));
 	}
 }

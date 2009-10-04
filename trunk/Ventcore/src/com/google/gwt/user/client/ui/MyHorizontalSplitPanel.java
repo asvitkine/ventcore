@@ -83,6 +83,7 @@ public final class MyHorizontalSplitPanel extends SplitPanel {
     }
 
     public void onAttach() {
+        DOM.setStyleAttribute(panel.getElement(), "position", "relative");
     }
 
     public void onDetach() {
