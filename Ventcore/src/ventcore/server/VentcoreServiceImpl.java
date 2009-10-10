@@ -17,15 +17,8 @@ import javax.net.ssl.TrustManagerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
-import ventcore.client.FileInfo;
-import ventcore.client.VentcoreService;
-import ventcore.client.LoginInfo;
-import ventcore.client.User;
-import ventcore.client.event.ChatEvent;
-import ventcore.client.event.FileListEvent;
-import ventcore.client.event.UserJoinEvent;
-import ventcore.client.event.UserLeaveEvent;
-import ventcore.client.event.UserListEvent;
+import ventcore.client.*;
+import ventcore.client.event.*;
 
 public class VentcoreServiceImpl extends RemoteServiceServlet implements VentcoreService {
 	public void login(String user, LoginInfo login) {
@@ -248,6 +241,11 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 					FileListEvent event = new FileListEvent();
 					event.setFiles(files);
 					files = new ArrayList<FileInfo>();
+					EventDispatcher.getInstance().dispatch(event, user);
+				} else if (code == WiredClient.MSG_PRIVATE_CHAT_INVITE) {
+					InviteEvent event = new InviteEvent();
+					event.setChatId(Integer.valueOf(params.get(0)));
+					event.setUserId(Integer.valueOf(params.get(1)));
 					EventDispatcher.getInstance().dispatch(event, user);
 				}
 			}
