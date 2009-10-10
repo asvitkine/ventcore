@@ -1,11 +1,10 @@
 package ventcore.client;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import ventcore.client.event.ChatEvent;
 import ventcore.client.event.FileListEvent;
+import ventcore.client.event.InviteEvent;
 import ventcore.client.event.RemoteEvent;
 import ventcore.client.event.UserJoinEvent;
 import ventcore.client.event.UserLeaveEvent;
@@ -31,8 +30,7 @@ public class Ventcore implements EntryPoint {
 		public void onFailure(Throwable caught) {}
 		public void onSuccess(Void result) {}
 	};
-	private Map<Integer, ChatView> chats;
-	private static int lastChatId = 1;
+	private static ChatView chatView;
 
 	private static String generateRandomString() {
 		StringBuilder sb = new StringBuilder();
@@ -45,10 +43,7 @@ public class Ventcore implements EntryPoint {
 		Window.enableScrolling(false);
 		Keyboard.init();
 		createNavLinks();
-		chats = new HashMap<Integer, ChatView>();
-		ChatView cv = new ChatView(1);
-		chats.put(1, cv);
-		RootPanel.get("content").add(cv);
+		RootPanel.get("content").add(chatView = new ChatView());
 		LoginDialog dialog = new LoginDialog();
 		dialog.center();
 		dialog.show();
@@ -69,19 +64,31 @@ public class Ventcore implements EntryPoint {
 						for (RemoteEvent e : result) {
 							if (e instanceof ChatEvent) {
 								ChatEvent event = (ChatEvent) e;
-								chats.get(event.getChatId()).handleChatEvent(event);
+								chatView.getChatPanel(event.getChatId()).handleChatEvent(event);
 							} else if (e instanceof UserListEvent) {
 								UserListEvent event = (UserListEvent) e;
-								chats.get(event.getChatId()).setUserList(event.getUsers());
+								ChatPanel chat = chatView.getChatPanel(event.getChatId());
+								if (chat == null) {
+									chat = new ChatPanel(event.getChatId(), "Private Chat " + event.getChatId());
+									chatView.addChatPanel(chat);
+								}
+								chat.setUserList(event.getUsers());
 							} else if (e instanceof UserJoinEvent) {
 								UserJoinEvent event = (UserJoinEvent) e;
-								chats.get(event.getChatId()).handleUserJoin(event.getUser());
+								chatView.getChatPanel(event.getChatId()).handleUserJoin(event.getUser());
 							} else if (e instanceof UserLeaveEvent) {
 								UserLeaveEvent event = (UserLeaveEvent) e;
-								ChatView cv = chats.get(event.getChatId());
-								cv.handleUserLeave(cv.getUser(event.getUserId()));
+								ChatPanel chat = chatView.getChatPanel(event.getChatId());
+								chat.handleUserLeave(chat.getUser(event.getUserId()));
 							} else if (e instanceof FileListEvent) {
 								Ventcore.handleFileList(((FileListEvent)e).getFiles());
+							} else if (e instanceof InviteEvent) {
+								InviteEvent event = (InviteEvent) e;
+								User user = chatView.getChatPanel(1).getUser(event.getUserId());
+								InviteReceivedDialog dialog =
+									new InviteReceivedDialog(user, event.getChatId());
+								dialog.center();
+								dialog.show();
 							}
 						}
 						schedule(1);
@@ -97,12 +104,7 @@ public class Ventcore implements EntryPoint {
 		createNavLink("nav_chat", "<a href='javascript:;'>Chat</a>").addClickHandler(
 			new ClickHandler() {
 				public void onClick(ClickEvent event) {
-					ChatView cv = chats.get(lastChatId);
-					if (cv == null) {
-						cv = chats.get(1);
-					}
-					RootPanel.get("content").clear();
-					RootPanel.get("content").add(cv);
+					setContent(chatView);
 				}
 			});
 		createNavLink("nav_private", "<a href='javascript:;'>Private</a>");
@@ -149,16 +151,19 @@ public class Ventcore implements EntryPoint {
 	public static void login(LoginInfo loginInfo) {
 		ventcoreService.login(userKey, loginInfo, callback);		
 	}
+	
+	public static void joinChat(int chatId) {
+		ventcoreService.joinChat(userKey, chatId, callback);
+		ventcoreService.requestUserList(userKey, chatId, callback);
+	}
+	
+	public static void declineInvitation(int chatId) {
+		ventcoreService.declineInvitation(userKey, chatId, callback);
+	}
 
 	public static void setContent(Widget w) {
 		RootPanel rp = RootPanel.get("content");
-		if (rp.getWidgetCount() > 0) {
-			Widget old = rp.getWidget(0);
-			if (old instanceof ChatView) {
-				lastChatId = ((ChatView)old).getChatId();
-			}
-			rp.clear();
-		}
+		rp.clear();
 		rp.add(w);
 	}
 
