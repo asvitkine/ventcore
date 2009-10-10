@@ -120,7 +120,7 @@ table.hsplitter tr {
 div.userlist {
 	border: 1px solid #d4d4d4;
 	background: #fff;
-	height: 372px;
+	height: 100%;
 	overflow-y: scroll;
 }
 
