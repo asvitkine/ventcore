@@ -5,6 +5,10 @@
     font: 12px "Lucida Grande", "Trebuchet MS", Verdana, sans-serif;
     color: #000;
     height: 100%;
+    -moz-user-select: none;
+    -webkit-user-select: none; 
+    -khtml-user-select: none; 
+    user-select: none;
 }
 audio {
 	display: none;
@@ -39,10 +43,6 @@ div#navigation {
     border-bottom: 1px solid #ABABAB;
     height: 53px;
     font-size: 1.1em;
-    -moz-user-select: none;
-    -webkit-user-select: none; 
-    -khtml-user-select: none; 
-    user-select: none;
 }
 div#navigation ul {
     height: 53px;
@@ -105,6 +105,13 @@ div.chat_view {
 	height:100%;
 }
 
+div.chat_view div {
+	-moz-user-select: text;
+	-webkit-user-select: text;
+	-khtml-user-select: text; 
+	user-select: text;
+}
+
 div.gwt-hsplitter {
 	cursor: col-resize;
 }
@@ -122,9 +129,6 @@ div.userlist {
 	background: #fff;
 	height: 100%;
 	overflow-y: scroll;
-	-moz-user-select: none;
-	-webkit-user-select: none; 
-	-khtml-user-select: none; 
 }
 
 div.user {
