@@ -5,6 +5,7 @@ import java.util.*;
 import ventcore.client.event.ChatEvent;
 
 import com.google.gwt.event.dom.client.*;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.*;
 
 public class ChatPanel extends Composite {
@@ -14,14 +15,14 @@ public class ChatPanel extends Composite {
 	private FlowPanel messageList;
 	private FlowPanel userlist;
 	private List<User> users;
-	private Map<User, HTML> userListItems;
+	private Map<User, UserHTML> userListItems;
 	private User selectedUser;
 
 	public ChatPanel(int chatId, String name) {
 		this.chatId = chatId;
 		this.name = name;
 		users = new ArrayList<User>();
-		userListItems = new HashMap<User, HTML>();
+		userListItems = new HashMap<User, UserHTML>();
 		MyHorizontalSplitPanel split = new MyHorizontalSplitPanel();
 		split.setMinLeftWidth(275);
 		split.setMinRightWidth(125);
@@ -103,7 +104,8 @@ public class ChatPanel extends Composite {
 			} else {
 				img = "<img src='/images/reguser.png'/>";
 			}
-			HTML userHtml = new HTML(img + "<span class='color" + user.getStatus() + "'>" + user.getNick() + "</span>");
+			String htmlContent = img + "<span class='color" + user.getStatus() + "'>" + user.getNick() + "</span>";
+			UserHTML userHtml = new UserHTML(htmlContent);
 			userHtml.setStyleName("user");
 			if (prevSelectedUser != null && user.getId() == prevSelectedUser.getId()) {
 				userHtml.addStyleName("selected");
@@ -120,6 +122,13 @@ public class ChatPanel extends Composite {
 						}
 						userListItems.get(selectedUser = user).addStyleName("selected");
 					}
+				}
+			});
+			userHtml.addDoubleClickHandler(new DoubleClickHandler() {
+				public void onDoubleClick(DoubleClickEvent event) {
+					PrivateMessageDialog dialog = new PrivateMessageDialog(user.getId());
+					dialog.center();
+					dialog.show();
 				}
 			});
 		}
@@ -163,5 +172,15 @@ public class ChatPanel extends Composite {
 	
 	public int getChatId() {
 		return chatId;
+	}
+
+	private static class UserHTML extends HTML implements HasDoubleClickHandlers {
+		public UserHTML(String content) {
+			super(content);
+		}
+
+		public HandlerRegistration addDoubleClickHandler(DoubleClickHandler handler) {
+			return addDomHandler(handler, DoubleClickEvent.getType());
+		}
 	}
 }

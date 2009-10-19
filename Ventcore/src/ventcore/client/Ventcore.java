@@ -143,6 +143,10 @@ public class Ventcore implements EntryPoint {
 	public static void sendEmoteMessage(int chatId, String message) {
 		ventcoreService.sendEmoteMessage(userKey, chatId, message, callback);		
 	}
+	
+	public static void sendPrivateMessage(int userId, String message) {
+		ventcoreService.sendPrivateMessage(userKey, userId, message, callback);
+	}
 
 	public static void requestFileList(String path) {
 		ventcoreService.requestFileList(userKey, path, callback);		
@@ -151,7 +155,7 @@ public class Ventcore implements EntryPoint {
 	public static void login(LoginInfo loginInfo) {
 		ventcoreService.login(userKey, loginInfo, callback);		
 	}
-	
+
 	public static void joinChat(int chatId) {
 		ventcoreService.joinChat(userKey, chatId, callback);
 		ventcoreService.requestUserList(userKey, chatId, callback);
