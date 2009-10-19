@@ -1,7 +1,6 @@
 package ventcore.client;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import ventcore.client.event.ChatEvent;
 
@@ -15,11 +14,14 @@ public class ChatPanel extends Composite {
 	private FlowPanel messageList;
 	private FlowPanel userlist;
 	private List<User> users;
+	private Map<User, HTML> userListItems;
+	private User selectedUser;
 
 	public ChatPanel(int chatId, String name) {
 		this.chatId = chatId;
 		this.name = name;
 		users = new ArrayList<User>();
+		userListItems = new HashMap<User, HTML>();
 		MyHorizontalSplitPanel split = new MyHorizontalSplitPanel();
 		split.setMinLeftWidth(275);
 		split.setMinRightWidth(125);
@@ -89,7 +91,10 @@ public class ChatPanel extends Composite {
 	public void setUserList(List<User> users) {
 		this.users = users;
 		userlist.clear();
-		for (User user : users) {
+		userListItems.clear();
+		User prevSelectedUser = selectedUser;
+		selectedUser = null;
+		for (final User user : users) {
 			String img;
 			if (user.getImage() != null) {
 				img = "<img src='data:image;base64," + user.getImage() + "' />";
@@ -100,7 +105,23 @@ public class ChatPanel extends Composite {
 			}
 			HTML userHtml = new HTML(img + "<span class='color" + user.getStatus() + "'>" + user.getNick() + "</span>");
 			userHtml.setStyleName("user");
+			if (prevSelectedUser != null && user.getId() == prevSelectedUser.getId()) {
+				userHtml.addStyleName("selected");
+				selectedUser = prevSelectedUser;
+				prevSelectedUser = null;
+			}
+			userListItems.put(user, userHtml);
 			userlist.add(userHtml);
+			userHtml.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event) {
+					if (selectedUser != user) {
+						if (selectedUser != null) {
+							userListItems.get(selectedUser).removeStyleName("selected");
+						}
+						userListItems.get(selectedUser = user).addStyleName("selected");
+					}
+				}
+			});
 		}
 	}
 
