@@ -406,7 +406,7 @@ public abstract class WiredClient {
 		'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
 	};
-	private static String bytesToBase64(byte[] bytes) {
+	public static String bytesToBase64(byte[] bytes) {
 		int numFullGroups = bytes.length / 3;
 		int numBytesInPartialGroup = bytes.length - 3 * numFullGroups;
 		int resultLen = 4*((bytes.length + 2)/3);
