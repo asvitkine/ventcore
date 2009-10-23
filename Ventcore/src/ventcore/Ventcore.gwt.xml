@@ -3,5 +3,6 @@
 <module rename-to='ventcore'>
   <inherits name='com.google.gwt.user.User'/>
   <inherits name='com.google.gwt.user.theme.chrome.Chrome'/>
+  <inherits name='com.allen_sauer.gwt.voices.gwt-voices'/>
   <entry-point class='ventcore.client.Ventcore'/>
 </module>

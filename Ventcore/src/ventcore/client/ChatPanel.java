@@ -4,11 +4,13 @@ import java.util.*;
 
 import ventcore.client.event.ChatEvent;
 
+import com.allen_sauer.gwt.voices.client.Sound;
 import com.google.gwt.event.dom.client.*;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.*;
 
 public class ChatPanel extends Composite {
+	private static final Sound chatSound = Ventcore.createSound("chat");
 	private int chatId;
 	private String name;
 	private ScrollPanel messageScrollPanel;
@@ -87,6 +89,7 @@ public class ChatPanel extends Composite {
 		HTML msg = new HTML("&nbsp;&nbsp;" + message);
 		msg.setStyleName("info");
 		messageList.add(msg);
+		chatSound.play();
 	}
 
 	public void setUserList(List<User> users) {

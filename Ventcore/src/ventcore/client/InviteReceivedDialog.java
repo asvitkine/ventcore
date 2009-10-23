@@ -1,5 +1,6 @@
 package ventcore.client;
 
+import com.allen_sauer.gwt.voices.client.Sound;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
@@ -9,6 +10,8 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class InviteReceivedDialog extends DialogBox {
+	private static final Sound inviteSound = Ventcore.createSound("invite");
+
 	public InviteReceivedDialog(User user, final int chatId) {
 		setText("Private Chat Invitation");
 		setAnimationEnabled(true);
@@ -36,5 +39,11 @@ public class InviteReceivedDialog extends DialogBox {
 		p.add(label);
 		p.add(panel);
 		setWidget(p);
+	}
+
+	@Override
+	public void show() {
+		super.show();
+		inviteSound.play();
 	}
 }
