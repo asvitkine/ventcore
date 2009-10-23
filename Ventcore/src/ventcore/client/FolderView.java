@@ -7,6 +7,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class FolderView extends Composite {
@@ -26,6 +28,12 @@ public class FolderView extends Composite {
 	}
 
 	private Widget getNameWidget(final FileInfo file) {
+		String img ="";
+		if (file.getIcon() != null) {
+			img = "<img src='data:image;base64," + file.getIcon() + "' />";
+		}
+		HorizontalPanel p = new HorizontalPanel();
+		p.add(new HTML(img));
 		SimpleLink link = new SimpleLink(file.getName());
 		link.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
@@ -34,7 +42,8 @@ public class FolderView extends Composite {
 				}
 			}
 		});
-		return link;
+		p.add(link);
+		return p;
 	}
 
 	private String getSizeString(FileInfo file) {

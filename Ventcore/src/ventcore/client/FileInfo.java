@@ -14,7 +14,8 @@ public class FileInfo implements Serializable {
 	private long size;
 	private long creationDate;
 	private long modificationDate;
-
+	private String icon;
+	
 	public String getName() {
 		return name;
 	}
@@ -53,5 +54,11 @@ public class FileInfo implements Serializable {
 	}
 	public void setModificationDate(long modificationDate) {
 		this.modificationDate = modificationDate;
+	}
+	public String getIcon() {
+		return icon;
+	}
+	public void setIcon(String icon) {
+		this.icon = icon;
 	}
 }
