@@ -10,6 +10,8 @@ import ventcore.client.event.UserJoinEvent;
 import ventcore.client.event.UserLeaveEvent;
 import ventcore.client.event.UserListEvent;
 
+import com.allen_sauer.gwt.voices.client.Sound;
+import com.allen_sauer.gwt.voices.client.SoundController;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -23,6 +25,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class Ventcore implements EntryPoint {
+	private static final SoundController soundController = new SoundController();
 	private static final String userKey = generateRandomString();
 	private static final VentcoreServiceAsync ventcoreService = GWT.create(VentcoreService.class);
 	private static final EventServiceAsync eventService = GWT.create(EventService.class);
@@ -173,5 +176,9 @@ public class Ventcore implements EntryPoint {
 
 	public static void handleFileList(List<FileInfo> files) {
 		setContent(new FolderView(files));
+	}
+	
+	public static Sound createSound(String name) {
+		return soundController.createSound(Sound.MIME_TYPE_AUDIO_X_WAV, "sounds/" + name + ".wav");
 	}
 }
