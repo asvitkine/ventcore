@@ -87,13 +87,13 @@ public abstract class WiredClient {
 		ServerMessage msg;
 		sendHello();
 		msg = readServerMessage();
-		if (msg.code != 200)
+		if (msg.code != MSG_SERVER_INFO)
 			return msg.code;
 		sendNick(subst("Ventcore User", nick));
 		sendUsername(subst("guest", user));
 		sendPassword(subst(null, pass));
 		msg = readServerMessage();
-		if (msg.code != 201)
+		if (msg.code != MSG_LOGIN_SUCCESS)
 			return msg.code;
 		new Thread(new Runnable() { public void run() { processServerMessages(); } }).start();
 		final Timer timer = new Timer();
@@ -164,7 +164,7 @@ public abstract class WiredClient {
 	}
 
 	public synchronized void editUser(String name, String password, String group, Priveleges privileges) throws IOException {
-	 send("EDITUSER").send(SP).send(name).send(FS).send(SHA1(password)).send(FS).send(group).send(privileges).send(EOT);
+		send("EDITUSER").send(SP).send(name).send(FS).send(SHA1(password)).send(FS).send(group).send(privileges).send(EOT);
 	}
 
 	public synchronized void editGroup(String name, Priveleges privileges) throws IOException {
