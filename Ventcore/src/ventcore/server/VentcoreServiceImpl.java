@@ -254,6 +254,11 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 					event.setChatId(Integer.valueOf(params.get(0)));
 					event.setUserId(Integer.valueOf(params.get(1)));
 					EventDispatcher.getInstance().dispatch(event, user);
+				} else if (code == WiredClient.MSG_PRIVATE_MESSAGE) {
+					PrivateMessageEvent event = new PrivateMessageEvent();
+					event.setFromUserId(Integer.valueOf(params.get(0)));
+					event.setMessage(params.get(1));
+					EventDispatcher.getInstance().dispatch(event, user);
 				}
 			}
 		};
@@ -289,7 +294,7 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 		}
 		return fc.getIcon(file);
 	}
-	
+
 	private static String getIconAsString(String path) {
 		File file = new File("/Library/Wired/files/"+path);
 		if (file.exists()) {

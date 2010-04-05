@@ -2,13 +2,7 @@ package ventcore.client;
 
 import java.util.List;
 
-import ventcore.client.event.ChatEvent;
-import ventcore.client.event.FileListEvent;
-import ventcore.client.event.InviteEvent;
-import ventcore.client.event.RemoteEvent;
-import ventcore.client.event.UserJoinEvent;
-import ventcore.client.event.UserLeaveEvent;
-import ventcore.client.event.UserListEvent;
+import ventcore.client.event.*;
 
 import com.allen_sauer.gwt.voices.client.Sound;
 import com.allen_sauer.gwt.voices.client.SoundController;
@@ -26,6 +20,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class Ventcore implements EntryPoint {
 	private static final SoundController soundController = new SoundController();
+	private static final Sound pmSound = Ventcore.createSound("pm");
 	private static final String userKey = generateRandomString();
 	private static final VentcoreServiceAsync ventcoreService = GWT.create(VentcoreService.class);
 	private static final EventServiceAsync eventService = GWT.create(EventService.class);
@@ -92,6 +87,8 @@ public class Ventcore implements EntryPoint {
 									new InviteReceivedDialog(user, event.getChatId());
 								dialog.center();
 								dialog.show();
+							} else if (e instanceof PrivateMessageEvent) {
+								pmSound.play();
 							}
 						}
 						schedule(1);
@@ -167,7 +164,7 @@ public class Ventcore implements EntryPoint {
 	public static void declineInvitation(int chatId) {
 		ventcoreService.declineInvitation(userKey, chatId, callback);
 	}
-
+	
 	public static void setContent(Widget w) {
 		RootPanel rp = RootPanel.get("content");
 		rp.clear();
