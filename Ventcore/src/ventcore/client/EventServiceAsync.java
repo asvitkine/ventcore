@@ -2,10 +2,10 @@ package ventcore.client;
 
 import java.util.List;
 
-import ventcore.client.event.RemoteEvent;
+import wired.event.WiredEvent;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface EventServiceAsync {
-	public void receiveEvents(String user, AsyncCallback<List<RemoteEvent>> async);
+	public void receiveEvents(String user, AsyncCallback<List<WiredEvent>> async);
 }

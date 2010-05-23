@@ -2,7 +2,8 @@ package ventcore.client;
 
 import java.util.*;
 
-import ventcore.client.event.ChatEvent;
+import wired.event.ChatEvent;
+import wired.event.User;
 
 import com.allen_sauer.gwt.voices.client.Sound;
 import com.google.gwt.event.dom.client.*;
@@ -11,7 +12,7 @@ import com.google.gwt.user.client.ui.*;
 
 public class ChatPanel extends Composite {
 	private static final Sound chatSound = Ventcore.createSound("chat");
-	private int chatId;
+	private long chatId;
 	private String name;
 	private ScrollPanel messageScrollPanel;
 	private FlowPanel messageList;
@@ -20,7 +21,7 @@ public class ChatPanel extends Composite {
 	private Map<User, UserHTML> userListItems;
 	private User selectedUser;
 
-	public ChatPanel(int chatId, String name) {
+	public ChatPanel(long chatId, String name) {
 		this.chatId = chatId;
 		this.name = name;
 		users = new ArrayList<User>();
@@ -66,7 +67,7 @@ public class ChatPanel extends Composite {
 			user.getNick() + " has joined &gt;&gt;&gt;</font>");
 	}	
 	
-	public User getUser(int userId) {
+	public User getUser(long userId) {
 		for (User user : users)
 			if (user.getId() == userId)
 				return user;
@@ -100,7 +101,7 @@ public class ChatPanel extends Composite {
 		selectedUser = null;
 		for (final User user : users) {
 			String img;
-			if (user.getImage() != null) {
+			if (user.getImage().length() > 0) {
 				img = "<img src='data:image;base64," + user.getImage() + "' />";
 			} else if (user.isAdmin()) {
 				img = "<img src='/images/adminuser.png'/>";
@@ -173,7 +174,7 @@ public class ChatPanel extends Composite {
 		return name;
 	}
 	
-	public int getChatId() {
+	public long getChatId() {
 		return chatId;
 	}
 

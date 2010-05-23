@@ -2,7 +2,18 @@ package ventcore.client;
 
 import java.util.List;
 
-import ventcore.client.event.*;
+import wired.event.ChatEvent;
+import wired.event.FileInfo;
+import wired.event.FileListEvent;
+import wired.event.InviteEvent;
+import wired.event.NewsListEvent;
+import wired.event.NewsPost;
+import wired.event.PrivateMessageEvent;
+import wired.event.User;
+import wired.event.UserJoinEvent;
+import wired.event.UserLeaveEvent;
+import wired.event.UserListEvent;
+import wired.event.WiredEvent;
 
 import com.allen_sauer.gwt.voices.client.Sound;
 import com.allen_sauer.gwt.voices.client.SoundController;
@@ -51,15 +62,15 @@ public class Ventcore implements EntryPoint {
 	private void runTimer() {
 		Timer t = new Timer() {
 			public void run() {
-				Ventcore.getEventService().receiveEvents(Ventcore.getUserKey(), new AsyncCallback<List<RemoteEvent>>() {
+				Ventcore.getEventService().receiveEvents(Ventcore.getUserKey(), new AsyncCallback<List<WiredEvent>>() {
 
 					public void onFailure(Throwable caught) {
 						// TODO Auto-generated method stub
 						
 					}
 
-					public void onSuccess(List<RemoteEvent> result) {
-						for (RemoteEvent e : result) {
+					public void onSuccess(List<WiredEvent> result) {
+						for (WiredEvent e : result) {
 							if (e instanceof ChatEvent) {
 								ChatEvent event = (ChatEvent) e;
 								chatView.getChatPanel(event.getChatId()).handleChatEvent(event);
@@ -87,6 +98,8 @@ public class Ventcore implements EntryPoint {
 									new InviteReceivedDialog(user, event.getChatId());
 								dialog.center();
 								dialog.show();
+							} else if (e instanceof NewsListEvent) {
+								Ventcore.handleNewsList(((NewsListEvent)e).getNewsPosts());
 							} else if (e instanceof PrivateMessageEvent) {
 								pmSound.play();
 							}
@@ -114,10 +127,15 @@ public class Ventcore implements EntryPoint {
 					Ventcore.requestFileList("/");
 				}
 			});
-		createNavLink("nav_news", "<a href='javascript:;'>News</a>");
+		createNavLink("nav_news", "<a href='javascript:;'>News</a>").addClickHandler(
+				new ClickHandler() {
+					public void onClick(ClickEvent event) {
+						Ventcore.requestNews();
+					}
+				});
 		createNavLink("nav_connection", "<a href='javascript:;'>Disconnect</a>");
 	}
-	
+
 	private HTML createNavLink(String name, String content) {
 		HTML link = new HTML(content);
 		RootPanel.get(name).add(link);
@@ -136,16 +154,20 @@ public class Ventcore implements EntryPoint {
 		return eventService;
 	}
 
-	public static void sendChatMessage(int chatId, String message) {
+	public static void sendChatMessage(long chatId, String message) {
 		ventcoreService.sendChatMessage(userKey, chatId, message, callback);
 	}
 
-	public static void sendEmoteMessage(int chatId, String message) {
+	public static void sendEmoteMessage(long chatId, String message) {
 		ventcoreService.sendEmoteMessage(userKey, chatId, message, callback);		
 	}
 	
-	public static void sendPrivateMessage(int userId, String message) {
+	public static void sendPrivateMessage(long userId, String message) {
 		ventcoreService.sendPrivateMessage(userKey, userId, message, callback);
+	}
+
+	public static void requestNews() {
+		ventcoreService.requestNews(userKey, callback);		
 	}
 
 	public static void requestFileList(String path) {
@@ -156,12 +178,12 @@ public class Ventcore implements EntryPoint {
 		ventcoreService.login(userKey, loginInfo, callback);		
 	}
 
-	public static void joinChat(int chatId) {
+	public static void joinChat(long chatId) {
 		ventcoreService.joinChat(userKey, chatId, callback);
 		ventcoreService.requestUserList(userKey, chatId, callback);
 	}
 	
-	public static void declineInvitation(int chatId) {
+	public static void declineInvitation(long chatId) {
 		ventcoreService.declineInvitation(userKey, chatId, callback);
 	}
 	
@@ -173,6 +195,10 @@ public class Ventcore implements EntryPoint {
 
 	public static void handleFileList(List<FileInfo> files) {
 		setContent(new FolderView(files));
+	}
+	
+	public static void handleNewsList(List<NewsPost> news) {
+		setContent(new NewsView(news));
 	}
 	
 	public static Sound createSound(String name) {

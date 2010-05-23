@@ -6,7 +6,7 @@ public interface VentcoreServiceAsync {
 	void login(String user, LoginInfo login,
 			AsyncCallback<Void> async);
 
-	void banUser(String user, int userId, String message,
+	void banUser(String user, long userId, String message,
 			AsyncCallback<Void> callback);
 
 	void broadcastMessage(String user, String message,
@@ -18,7 +18,7 @@ public interface VentcoreServiceAsync {
 	void setFileComment(String user, String path, String comment,
 			AsyncCallback<Void> callback);
 
-	void declineInvitation(String user, int chatId,
+	void declineInvitation(String user, long chatId,
 			AsyncCallback<Void> callback);
 
 	void deleteFile(String user, String path,
@@ -36,7 +36,7 @@ public interface VentcoreServiceAsync {
 	void listUserAccounts(String user,
 			AsyncCallback<Void> callback);
 
-	void changeTopic(String user, int chatId, String topic,
+	void changeTopic(String user, long chatId, String topic,
 			AsyncCallback<Void> callback);
 
 	void createPrivateChat(String user,
@@ -45,19 +45,16 @@ public interface VentcoreServiceAsync {
 	void getFile(String user, String path, int offset,
 			AsyncCallback<Void> callback);
 
-	void identifyTransfer(String user, String hash,
+	void inviteToChat(String user, long userId, long chatId,
 			AsyncCallback<Void> callback);
 
-	void inviteToChat(String user, int userId, int chatId,
+	void joinChat(String user, long chatId,
 			AsyncCallback<Void> callback);
 
-	void joinChat(String user, int chatId,
+	void kickUser(String user, long userId, String message,
 			AsyncCallback<Void> callback);
 
-	void kickUser(String user, int userId, String message,
-			AsyncCallback<Void> callback);
-
-	void leaveChat(String user, int chatId,
+	void leaveChat(String user, long chatId,
 			AsyncCallback<Void> callback);
 
 	void moveFile(String user, String from, String to,
@@ -87,22 +84,22 @@ public interface VentcoreServiceAsync {
 	void requestPrivilegeMask(String user,
 			AsyncCallback<Void> callback);
 
-	void requestUserInfo(String user, int userId,
+	void requestUserInfo(String user, long userId,
 			AsyncCallback<Void> callback);
 
-	void requestUserList(String user, int chatId,
+	void requestUserList(String user, long chatId,
 			AsyncCallback<Void> callback);
 
 	void searchFor(String user, String query,
 			AsyncCallback<Void> callback);
 
-	void sendChatMessage(String user, int chatId, String message,
+	void sendChatMessage(String user, long chatId, String message,
 			AsyncCallback<Void> callback);
 
-	void sendEmoteMessage(String user, int chatId, String message,
+	void sendEmoteMessage(String user, long chatId, String message,
 			AsyncCallback<Void> callback);
 
-	void sendPrivateMessage(String user, int userId, String message,
+	void sendPrivateMessage(String user, long userId, String message,
 			AsyncCallback<Void> callback);
 
 	void sendStatusMessage(String user, String status,

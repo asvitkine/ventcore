@@ -3,7 +3,7 @@ package ventcore.server;
 import java.util.*;
 import java.util.concurrent.*;
 
-import ventcore.client.event.RemoteEvent;
+import wired.event.WiredEvent;
 
 public class EventDispatcher {
 	private static final EventDispatcher instance = new EventDispatcher();
@@ -11,21 +11,21 @@ public class EventDispatcher {
 	private EventDispatcher() {
 	}
 
-	private BlockingQueue<RemoteEvent> getUserEventQueue(String user) {
+	private BlockingQueue<WiredEvent> getUserEventQueue(String user) {
 		return UserManager.getInstance().getUserData(user).getEventQueue();
 	}
 	
-	public synchronized void dispatch(RemoteEvent event, String user) {
+	public synchronized void dispatch(WiredEvent event, String user) {
 		getUserEventQueue(user).add(event);
 	}
 
-	public void accumulateEvents(String user, List<RemoteEvent> events, long timeoutMillis) {
-		BlockingQueue<RemoteEvent> queue = getUserEventQueue(user);
+	public void accumulateEvents(String user, List<WiredEvent> events, long timeoutMillis) {
+		BlockingQueue<WiredEvent> queue = getUserEventQueue(user);
 		int ndrained = queue.drainTo(events);
 		if (ndrained == 0) {
 			long tooLate = System.currentTimeMillis() + timeoutMillis;
 			while (System.currentTimeMillis() < tooLate) {
-				RemoteEvent e = null;;
+				WiredEvent e = null;;
 				try {
 					e = queue.poll(50, TimeUnit.MILLISECONDS);
 				} catch (InterruptedException e1) { }

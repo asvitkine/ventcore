@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;
 import java.security.KeyStore;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -25,7 +23,12 @@ import javax.swing.JFileChooser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import ventcore.client.*;
-import ventcore.client.event.*;
+import wired.EventBasedWiredClient;
+import wired.WiredClient;
+import wired.WiredEventHandler;
+import wired.WiredUtils;
+import wired.event.FileInfo;
+import wired.event.WiredEvent;
 
 public class VentcoreServiceImpl extends RemoteServiceServlet implements VentcoreService {
 	public void login(String user, LoginInfo login) {
@@ -45,7 +48,7 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 		return UserManager.getInstance().getUserData(user).getWiredClient();
 	}
 	
-	public void banUser(String user, int userId, String message) throws IOException {
+	public void banUser(String user, long userId, String message) throws IOException {
 		getWiredClient(user).banUser(userId, message);
 	}
 
@@ -61,7 +64,7 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 		getWiredClient(user).setFileComment(path, comment);
 	}
 
-	public void declineInvitation(String user, int chatId) throws IOException {
+	public void declineInvitation(String user, long chatId) throws IOException {
 		getWiredClient(user).declineInvitation(chatId);
 	}
 
@@ -89,23 +92,23 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 		getWiredClient(user).requestGroupList();
 	}
 
-	public void requestUserInfo(String user, int userId) throws IOException {
+	public void requestUserInfo(String user, long userId) throws IOException {
 		getWiredClient(user).requestUserInfo(userId);
 	}
 	
-	public void inviteToChat(String user, int userId, int chatId) throws IOException {
+	public void inviteToChat(String user, long userId, long chatId) throws IOException {
 		getWiredClient(user).inviteToChat(userId, chatId);
 	}
 
-	public void joinChat(String user, int chatId) throws IOException {
+	public void joinChat(String user, long chatId) throws IOException {
 		getWiredClient(user).joinChat(chatId);
 	}
 
-	public void kickUser(String user, int userId, String message) throws IOException {
+	public void kickUser(String user, long userId, String message) throws IOException {
 		getWiredClient(user).kickUser(userId, message);
 	}
 
-	public void leaveChat(String user, int chatId) throws IOException {
+	public void leaveChat(String user, long chatId) throws IOException {
 		getWiredClient(user).leaveChat(chatId);
 	}
 
@@ -113,7 +116,7 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 		getWiredClient(user).requestFileList(path);
 	}
 	
-	public void sendEmoteMessage(String user, int chatId, String message) throws IOException {
+	public void sendEmoteMessage(String user, long chatId, String message) throws IOException {
 		getWiredClient(user).sendEmoteMessage(chatId, message);
 	}
 
@@ -121,7 +124,7 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 		getWiredClient(user).moveFile(from, to);
 	}
 	
-	public void sendPrivateMessage(String user, int userId, String message) throws IOException {
+	public void sendPrivateMessage(String user, long userId, String message) throws IOException {
 		getWiredClient(user).sendPrivateMessage(userId, message);
 	}
 
@@ -149,7 +152,7 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 		getWiredClient(user).readGroupInfo(name);
 	}
 
-	public void sendChatMessage(String user, int chatId, String message) throws IOException {
+	public void sendChatMessage(String user, long chatId, String message) throws IOException {
 		getWiredClient(user).sendChatMessage(chatId, message);
 	}
 
@@ -165,19 +168,15 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 		getWiredClient(user).sendStatusMessage(status);
 	}
 	
-	public void changeTopic(String user, int chatId, String topic) throws IOException {
+	public void changeTopic(String user, long chatId, String topic) throws IOException {
 		getWiredClient(user).changeTopic(chatId, topic);
-	}
-
-	public void identifyTransfer(String user, String hash) throws IOException {
-		getWiredClient(user).identifyTransfer(hash);
 	}
 
 	public void listUserAccounts(String user) throws IOException {
 		getWiredClient(user).listUserAccounts();
 	}
 
-	public void requestUserList(String user, int chatId) throws IOException {
+	public void requestUserList(String user, long chatId) throws IOException {
 		getWiredClient(user).requestUserList(chatId);
 	}
 
@@ -197,89 +196,19 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 		SSLSocketFactory factory = context.getSocketFactory();
 		SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
 		socket.setEnabledProtocols(new String[] {"TLSv1"});
-		return new WiredClient(socket.getInputStream(), socket.getOutputStream()) {
-			HashMap<Integer,List<User>> users = new HashMap<Integer,List<User>>();
-			ArrayList<FileInfo> files = new ArrayList<FileInfo>();
-			protected void processServerMessage(int code, List<String> params) {
-				System.out.println("Got " + code);
-				if (params != null) {
-					System.out.println("With params: ");
-					for (String p : params)
-						System.out.println("  " + p);
-				}
-				if (code == WiredClient.MSG_CHAT || code == WiredClient.MSG_ACTION_CHAT) {
-					ChatEvent event = new ChatEvent();
-					event.setChatId(Integer.valueOf(params.get(0)));
-					event.setUserId(Integer.valueOf(params.get(1)));
-					event.setMessage(params.get(2));
-					event.setEmote(code == WiredClient.MSG_ACTION_CHAT);
-					EventDispatcher.getInstance().dispatch(event, user);
-				} else if (code == WiredClient.MSG_USERLIST) {
-					int chatId = Integer.valueOf(params.get(0));
-					List<User> userlist = users.get(chatId);
-					if (userlist == null) {
-						userlist = new ArrayList<User>();
-						users.put(chatId, userlist);
-					}
-					userlist.add(readUser(params));
-				} else if (code == WiredClient.MSG_USERLIST_DONE) {
-					int chatId = Integer.valueOf(params.get(0));
-					List<User> userlist = users.get(chatId);
-					if (userlist != null) {
-						UserListEvent event = new UserListEvent();
-						event.setChatId(chatId);
-						event.setUsers(userlist);
-						EventDispatcher.getInstance().dispatch(event, user);
-						users.remove(chatId);
-					}
-				} else if (code == WiredClient.MSG_CLIENT_JOIN) {
-					UserJoinEvent event = new UserJoinEvent();
-					event.setChatId(Integer.valueOf(params.get(0)));
-					event.setUser(readUser(params));
+		return new EventBasedWiredClient(socket.getInputStream(), socket.getOutputStream(),
+			new WiredEventHandler() {
+				public void handleEvent(WiredEvent event) {
 					EventDispatcher.getInstance().dispatch(event, user);					
-				} else if (code == WiredClient.MSG_CLIENT_LEAVE) {
-					UserLeaveEvent event = new UserLeaveEvent();
-					event.setChatId(Integer.valueOf(params.get(0)));
-					event.setUserId(Integer.valueOf(params.get(1)));
-					EventDispatcher.getInstance().dispatch(event, user);	
-				} else if (code == WiredClient.MSG_FILE_LISTING) {
-					files.add(readFile(params));
-				} else if (code == WiredClient.MSG_FILE_LISTING_DONE) {
-					FileListEvent event = new FileListEvent();
-					event.setFiles(files);
-					files = new ArrayList<FileInfo>();
-					EventDispatcher.getInstance().dispatch(event, user);
-				} else if (code == WiredClient.MSG_PRIVATE_CHAT_INVITE) {
-					InviteEvent event = new InviteEvent();
-					event.setChatId(Integer.valueOf(params.get(0)));
-					event.setUserId(Integer.valueOf(params.get(1)));
-					EventDispatcher.getInstance().dispatch(event, user);
-				} else if (code == WiredClient.MSG_PRIVATE_MESSAGE) {
-					PrivateMessageEvent event = new PrivateMessageEvent();
-					event.setFromUserId(Integer.valueOf(params.get(0)));
-					event.setMessage(params.get(1));
-					EventDispatcher.getInstance().dispatch(event, user);
 				}
 			}
+		) {
+			protected FileInfo readFile(List<String> params) {
+				FileInfo file = super.readFile(params);
+				file.setIcon(getIconAsString(params.get(0)));
+				return file;
+			}
 		};
-	}
-
-	private static long parseDate(String dateString) {
-		System.out.println(dateString);
-		System.out.println(ISO8601.parse(dateString).toString());
-		return ISO8601.parse(dateString).getTimeInMillis();
-	}
-
-	private static FileInfo readFile(List<String> params) {
-		FileInfo file = new FileInfo();
-		file.setPath(params.get(0));
-		file.setName(new File(params.get(0)).getName());
-		file.setType(Integer.valueOf(params.get(1)));		
-		file.setSize(Integer.valueOf(params.get(2)));
-		file.setCreationDate(parseDate(params.get(3)));
-		file.setModificationDate(parseDate(params.get(4)));
-		file.setIcon(getIconAsString(params.get(0)));
-		return file;
 	}
 	
 	private static SoftReference<JFileChooser> iconFileChooserRef;
@@ -301,7 +230,7 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 			Icon icon = getFileIcon(file);
 			if (icon != null) {
 				BufferedImage image =
-					new BufferedImage(icon.getIconWidth(), icon.getIconWidth(), BufferedImage.TYPE_INT_ARGB);
+					new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 				Graphics2D g = image.createGraphics();
 				icon.paintIcon(null, g, 0, 0);
 				g.dispose();
@@ -309,24 +238,12 @@ public class VentcoreServiceImpl extends RemoteServiceServlet implements Ventcor
 				ByteArrayOutputStream out = new ByteArrayOutputStream();
 				try {
 					ImageIO.write(image, "png", out);
-					return WiredClient.bytesToBase64(out.toByteArray());
+					return WiredUtils.bytesToBase64(out.toByteArray());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		}
 		return null;
-	}
-	
-	private static User readUser(List<String> params) {
-		User user = new User();
-		user.setId(Integer.valueOf(params.get(1)));
-		user.setIdle(Boolean.valueOf(params.get(2)));
-		user.setAdmin(Boolean.valueOf(params.get(3)));
-		user.setNick(params.get(5));
-		user.setLogin(params.get(6));
-		if (params.size() > 9)
-			user.setImage(params.get(9));
-		return user;
 	}
 }

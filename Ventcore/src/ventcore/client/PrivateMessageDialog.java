@@ -11,7 +11,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class PrivateMessageDialog extends DialogBox {
 	private TextArea message;
 
-	public PrivateMessageDialog(final int toUserId) {
+	public PrivateMessageDialog(final long toUserId) {
 		setText("Private Message");
 		setAnimationEnabled(true);
 		VerticalPanel p = new VerticalPanel();
@@ -35,5 +35,10 @@ public class PrivateMessageDialog extends DialogBox {
 		p.add(panel);
 		p.setCellHorizontalAlignment(panel, VerticalPanel.ALIGN_RIGHT);
 		setWidget(p);
+	}
+
+	public void show() {
+		super.show();
+		message.setFocus(true);
 	}
 }
