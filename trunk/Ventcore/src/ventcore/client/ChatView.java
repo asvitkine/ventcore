@@ -39,7 +39,7 @@ public class ChatView extends Composite implements ChangeHandler {
 		onChange(null);
 	}
 	
-	public ChatPanel getChatPanel(int chatId) {
+	public ChatPanel getChatPanel(long chatId) {
 		for (ChatPanel cp : chats) {
 			if (cp.getChatId() == chatId) {
 				return cp;

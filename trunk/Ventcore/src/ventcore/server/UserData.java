@@ -3,17 +3,18 @@ package ventcore.server;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import ventcore.client.event.*;
+import wired.WiredClient;
+import wired.event.WiredEvent;
 
 public class UserData {
-	private BlockingQueue<RemoteEvent> eventQueue;
+	private BlockingQueue<WiredEvent> eventQueue;
 	private WiredClient client;
 	
 	public UserData() {
-		eventQueue = new LinkedBlockingQueue<RemoteEvent>();
+		eventQueue = new LinkedBlockingQueue<WiredEvent>();
 	}
 
-	public BlockingQueue<RemoteEvent> getEventQueue() {
+	public BlockingQueue<WiredEvent> getEventQueue() {
 		return eventQueue;
 	}
 

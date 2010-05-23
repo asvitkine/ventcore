@@ -2,7 +2,7 @@ package ventcore.client;
 
 import java.util.List;
 
-import ventcore.client.event.RemoteEvent;
+import wired.event.WiredEvent;
 
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -10,5 +10,5 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("events")
 public interface EventService extends RemoteService {
-	public List<RemoteEvent> receiveEvents(String user);
+	public List<WiredEvent> receiveEvents(String user);
 }

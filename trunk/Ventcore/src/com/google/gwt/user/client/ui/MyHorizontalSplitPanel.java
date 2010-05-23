@@ -39,6 +39,7 @@ import com.google.gwt.i18n.client.LocaleInfo;
  * <li>.gwt-HorizontalSplitPanel hsplitter { the splitter }</li>
  * </ul>
  */
+@SuppressWarnings("deprecation")
 public final class MyHorizontalSplitPanel extends SplitPanel {
   /**
    * The standard implementation for horizontal split panels.
