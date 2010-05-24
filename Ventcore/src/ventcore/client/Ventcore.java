@@ -24,6 +24,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Window.ClosingEvent;
+import com.google.gwt.user.client.Window.ClosingHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -50,6 +52,13 @@ public class Ventcore implements EntryPoint {
 	
 	public void onModuleLoad() {
 		Window.enableScrolling(false);
+		// TODO: Do this only if we're logged in.
+		Window.addWindowClosingHandler(new ClosingHandler() {
+			public void onWindowClosing(ClosingEvent event) {
+				event.setMessage("If you close the page now, you will be " +
+					"disconnected from the current chat session.");
+			}
+		});
 		Keyboard.init();
 		createNavLinks();
 		RootPanel.get("content").add(chatView = new ChatView());
