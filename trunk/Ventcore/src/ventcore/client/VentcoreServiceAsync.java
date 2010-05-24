@@ -104,4 +104,6 @@ public interface VentcoreServiceAsync {
 
 	void sendStatusMessage(String user, String status,
 			AsyncCallback<Void> callback);
+
+	void disconnect(String userKey, AsyncCallback<Void> callback);
 }

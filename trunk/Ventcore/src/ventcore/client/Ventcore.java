@@ -21,6 +21,8 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
@@ -57,6 +59,11 @@ public class Ventcore implements EntryPoint {
 			public void onWindowClosing(ClosingEvent event) {
 				event.setMessage("If you close the page now, you will be " +
 					"disconnected from the current chat session.");
+			}
+		});
+		Window.addCloseHandler(new CloseHandler<Window>() {
+			public void onClose(CloseEvent<Window> event) {
+				disconnect();				
 			}
 		});
 		Keyboard.init();
@@ -194,6 +201,10 @@ public class Ventcore implements EntryPoint {
 	
 	public static void declineInvitation(long chatId) {
 		ventcoreService.declineInvitation(userKey, chatId, callback);
+	}
+
+	public static void disconnect() {
+		ventcoreService.disconnect(userKey, callback);
 	}
 	
 	public static void setContent(Widget w) {
