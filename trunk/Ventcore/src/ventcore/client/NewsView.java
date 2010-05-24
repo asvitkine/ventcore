@@ -13,6 +13,8 @@ public class NewsView extends Composite {
 
 	public NewsView(List<NewsPost> newsList) {
 		news = new TextArea();
+		news.setReadOnly(true);
+		news.setSize("100%", "100%");
 		StringBuilder sb = new StringBuilder();
 		for (NewsPost post : newsList) {
 			if (post != newsList.get(0)) {
@@ -29,7 +31,6 @@ public class NewsView extends Composite {
 			//	post.getNick(), new Date(post.getPostTime()).toString(), post.getPost()));
 		}
 		news.setText(sb.toString());
-		news.setSize("100%", "100%");
 	    initWidget(news);
 	}
 
