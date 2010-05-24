@@ -3,12 +3,11 @@ package ventcore.server;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import wired.WiredClient;
 import wired.event.WiredEvent;
 
 public class UserData {
 	private BlockingQueue<WiredEvent> eventQueue;
-	private WiredClient client;
+	private VentcoreWiredClient client;
 	
 	public UserData() {
 		eventQueue = new LinkedBlockingQueue<WiredEvent>();
@@ -18,11 +17,11 @@ public class UserData {
 		return eventQueue;
 	}
 
-	public void setWiredClient(WiredClient client) {
+	public void setWiredClient(VentcoreWiredClient client) {
 		this.client = client;
 	}
 	
-	public WiredClient getWiredClient() {
+	public VentcoreWiredClient getWiredClient() {
 		return client;
 	}
 }

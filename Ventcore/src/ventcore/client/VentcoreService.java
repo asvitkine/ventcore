@@ -41,4 +41,5 @@ public interface VentcoreService extends RemoteService {
 	public void changeTopic(String user, long chatId, String topic) throws IOException;
 	public void listUserAccounts(String user) throws IOException;
 	public void requestUserList(String user, long chatId) throws IOException;
+	public void disconnect(String user);
 }
