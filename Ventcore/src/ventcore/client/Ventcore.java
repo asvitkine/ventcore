@@ -129,23 +129,38 @@ public class Ventcore implements EntryPoint {
 		t.schedule(1);
 	}
 
+	private void setCurrentNavTab(String name) {
+		for (String tab : new String[]{"chat", "private", "files","news","connection"}) {
+			RootPanel.get("nav_" + tab).setStyleName(tab.equals(name) ? "front" : "back");
+		}
+	}
+
 	private void createNavLinks() {
 		createNavLink("nav_chat", "<a href='javascript:;'>Chat</a>").addClickHandler(
 			new ClickHandler() {
 				public void onClick(ClickEvent event) {
+					setCurrentNavTab("chat");
 					setContent(chatView);
 				}
 			});
-		createNavLink("nav_private", "<a href='javascript:;'>Private</a>");
+		createNavLink("nav_private", "<a href='javascript:;'>Private</a>").addClickHandler(
+				new ClickHandler() {
+					public void onClick(ClickEvent event) {
+						setCurrentNavTab("private");
+						setContent(new HTML());
+					}
+				});
 		createNavLink("nav_files", "<a href='javascript:;'>Files</a>").addClickHandler(
 			new ClickHandler() {
 				public void onClick(ClickEvent event) {
+					setCurrentNavTab("files");
 					Ventcore.requestFileList("/");
 				}
 			});
 		createNavLink("nav_news", "<a href='javascript:;'>News</a>").addClickHandler(
 				new ClickHandler() {
 					public void onClick(ClickEvent event) {
+						setCurrentNavTab("news");
 						Ventcore.requestNews();
 					}
 				});
