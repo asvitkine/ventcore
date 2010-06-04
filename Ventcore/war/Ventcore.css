@@ -116,11 +116,16 @@ div.gwt-hsplitter {
 }
 
 table.hsplitter {
+	cursor: col-resize;
 	width: 10px;
 }
 
 table.hsplitter tr {
 	display:none;
+}
+
+div.vsplitter {
+	cursor: row-resize;
 }
 
 div.userlist {

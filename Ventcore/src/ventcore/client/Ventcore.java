@@ -1,5 +1,6 @@
 package ventcore.client;
 
+import java.util.Date;
 import java.util.List;
 
 import wired.event.ChatEvent;
@@ -44,6 +45,7 @@ public class Ventcore implements EntryPoint {
 		public void onSuccess(Void result) {}
 	};
 	private static ChatView chatView;
+	private static PrivateMessagesView privateMessagesView;
 
 	private static String generateRandomString() {
 		StringBuilder sb = new StringBuilder();
@@ -69,6 +71,7 @@ public class Ventcore implements EntryPoint {
 		Keyboard.init();
 		createNavLinks();
 		RootPanel.get("content").add(chatView = new ChatView());
+		privateMessagesView = new PrivateMessagesView();
 		LoginDialog dialog = new LoginDialog();
 		dialog.center();
 		dialog.show();
@@ -117,6 +120,10 @@ public class Ventcore implements EntryPoint {
 							} else if (e instanceof NewsListEvent) {
 								Ventcore.handleNewsList(((NewsListEvent)e).getNewsPosts());
 							} else if (e instanceof PrivateMessageEvent) {
+								PrivateMessageEvent event = (PrivateMessageEvent) e;
+								User user = chatView.getChatPanel(1).getUser(event.getFromUserId());
+								PrivateMessage pm = new PrivateMessage(user, new Date(), event.getMessage());
+								privateMessagesView.addPrivateMessage(pm);
 								pmSound.play();
 							}
 						}
@@ -147,7 +154,7 @@ public class Ventcore implements EntryPoint {
 				new ClickHandler() {
 					public void onClick(ClickEvent event) {
 						setCurrentNavTab("private");
-						setContent(new HTML());
+						setContent(privateMessagesView);
 					}
 				});
 		createNavLink("nav_files", "<a href='javascript:;'>Files</a>").addClickHandler(

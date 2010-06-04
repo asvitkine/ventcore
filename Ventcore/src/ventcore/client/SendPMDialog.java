@@ -8,10 +8,10 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class PrivateMessageDialog extends DialogBox {
+public class SendPMDialog extends DialogBox {
 	private TextArea message;
 
-	public PrivateMessageDialog(final long toUserId) {
+	public SendPMDialog(final long toUserId) {
 		setText("Private Message");
 		setAnimationEnabled(true);
 		VerticalPanel p = new VerticalPanel();
