@@ -130,7 +130,7 @@ public class ChatPanel extends Composite {
 			});
 			userHtml.addDoubleClickHandler(new DoubleClickHandler() {
 				public void onDoubleClick(DoubleClickEvent event) {
-					PrivateMessageDialog dialog = new PrivateMessageDialog(user.getId());
+					SendPMDialog dialog = new SendPMDialog(user.getId());
 					dialog.center();
 					dialog.show();
 				}
