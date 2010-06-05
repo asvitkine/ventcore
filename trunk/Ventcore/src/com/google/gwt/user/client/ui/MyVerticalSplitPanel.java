@@ -432,7 +432,7 @@ public final class MyVerticalSplitPanel extends SplitPanel {
      * The style name is placed on the table rather than splitElem to allow the
      * splitter to be styled without interfering with layout.
      */
-    DOM.setInnerHTML(splitDiv, "<div class='vsplitter' "
+    DOM.setInnerHTML(splitDiv, "<div class='gwt-vsplitter' "
         + "style='text-align:center;'>" + thumb.getHTML() + "</div>");
 
     //addScrolling(topDiv);

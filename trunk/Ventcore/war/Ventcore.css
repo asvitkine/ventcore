@@ -115,7 +115,7 @@ div.gwt-hsplitter {
 	cursor: col-resize;
 }
 
-table.hsplitter {
+table.gwt-hsplitter {
 	cursor: col-resize;
 	width: 10px;
 }
