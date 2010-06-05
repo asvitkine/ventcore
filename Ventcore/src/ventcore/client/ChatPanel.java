@@ -150,9 +150,9 @@ public class ChatPanel extends Composite {
 		button.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				if (Keyboard.isAltDown())
-					Ventcore.sendEmoteMessage(1, field.getText());
+					Ventcore.sendEmoteMessage(chatId, field.getText());
 				else
-					Ventcore.sendChatMessage(1, field.getText());
+					Ventcore.sendChatMessage(chatId, field.getText());
 				field.setText("");
 			}
 		});
