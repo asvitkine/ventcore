@@ -16,12 +16,14 @@
 package com.google.gwt.user.client.ui;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.i18n.client.LocaleInfo;
 
 /**
  * A panel that arranges two widgets in a single horizontal row and allows the
@@ -39,8 +41,18 @@ import com.google.gwt.i18n.client.LocaleInfo;
  * <li>.gwt-HorizontalSplitPanel hsplitter { the splitter }</li>
  * </ul>
  */
-@SuppressWarnings("deprecation")
 public final class MyHorizontalSplitPanel extends SplitPanel {
+	  /**
+	   * The default resources used by this widget.
+	   */
+	  public interface Resources extends ClientBundle {
+	    /**
+	     * An image representing the drag thumb.
+	     */
+	    @Source("splitPanelThumb.png")
+	    ImageResource horizontalSplitPanelThumb();
+	  }
+
   /**
    * The standard implementation for horizontal split panels.
    */
@@ -103,10 +115,9 @@ public final class MyHorizontalSplitPanel extends SplitPanel {
     /**
      * Set the splitter's position in units of pixels.
      * 
-     * px represents the splitter's position as a distance
-     * of px pixels from the left edge of the container. This is
-     * true even in a bidi environment. Callers of this method
-     * must be aware of this constraint.
+     * px represents the splitter's position as a distance of px pixels from the
+     * left edge of the container. This is true even in a bidi environment.
+     * Callers of this method must be aware of this constraint.
      */
     public void setSplitPositionUsingPixels(int px) {
       final Element splitElem = panel.getSplitElement();
@@ -151,6 +162,12 @@ public final class MyHorizontalSplitPanel extends SplitPanel {
       updateRightWidth(rightElem, newRightWidth);
     }
 
+    /**
+     * Implemented by subclasses.
+     *
+     * @param rightElem
+     * @param newRightWidth
+     */
     public void updateRightWidth(Element rightElem, int newRightWidth) {
       // No need to update the width of the right side; this will be
       // recomputed automatically by CSS. This is helpful, as we do not
@@ -162,7 +179,7 @@ public final class MyHorizontalSplitPanel extends SplitPanel {
   /**
    * The IE6 implementation for horizontal split panels.
    */
-  @SuppressWarnings("unused")
+  @SuppressWarnings("unused") // will be used by IE6 permutation
   private static class ImplIE6 extends Impl {
 
     private boolean isResizeInProgress = false;
@@ -298,9 +315,9 @@ public final class MyHorizontalSplitPanel extends SplitPanel {
 
     private native void addResizeListener(Element container) /*-{
       var self = this;
-      container.onresize = function() {
+      container.onresize = $entry(function() {
         self.@com.google.gwt.user.client.ui.HorizontalSplitPanel$ImplIE6::onResize()();
-      };
+      });
     }-*/;
 
     private void onResize() {
@@ -319,7 +336,7 @@ public final class MyHorizontalSplitPanel extends SplitPanel {
    * The Safari implementation which owes its existence entirely to a single
    * WebKit bug: http://bugs.webkit.org/show_bug.cgi?id=9137.
    */
-  @SuppressWarnings("unused")
+  @SuppressWarnings("unused") // will be used by Safari permutation
   private static class ImplSafari extends Impl {
     @Override
     public void init(MyHorizontalSplitPanel panel) {
@@ -362,41 +379,45 @@ public final class MyHorizontalSplitPanel extends SplitPanel {
   
   private int minLeftWidth;
   private int minRightWidth;
-  
 
-public int getMinLeftWidth() {
+
+  public MyHorizontalSplitPanel() {
+    this(GWT.<Resources> create(Resources.class));
+  }
+
+  public int getMinLeftWidth() {
 	return minLeftWidth;
-}
+  }
 
-public void setMinLeftWidth(int minLeftWidth) {
+  public void setMinLeftWidth(int minLeftWidth) {
 	this.minLeftWidth = minLeftWidth;
-}
+  }
 
-public int getMinRightWidth() {
+  public int getMinRightWidth() {
 	return minRightWidth;
-}
+  }
 
-public void setMinRightWidth(int minRightWidth) {
+  public void setMinRightWidth(int minRightWidth) {
 	this.minRightWidth = minRightWidth;
-}
-
-public MyHorizontalSplitPanel() {
-    this(GWT.<HorizontalSplitPanelImages>create(HorizontalSplitPanelImages.class));
   }
 
   /**
    * Creates an empty horizontal split panel.
    * 
-   * @param images ImageBundle containing an image for the splitter's drag
-   *               thumb 
+   * @param resources ClientBundle containing an image for the splitter's drag
+   *          thumb
    */
-  public MyHorizontalSplitPanel(HorizontalSplitPanelImages images) {
+  public MyHorizontalSplitPanel(Resources resources) {
+    this(AbstractImagePrototype.create(resources.horizontalSplitPanelThumb()));
+  }
+
+  private MyHorizontalSplitPanel(AbstractImagePrototype thumbImage) {
     super(DOM.createDiv(), DOM.createDiv(), preventBoxStyles(DOM.createDiv()),
         preventBoxStyles(DOM.createDiv()));
 
     container = preventBoxStyles(DOM.createDiv());
 
-    buildDOM(images.horizontalSplitPanelThumb());
+    buildDOM(thumbImage);
 
     setStyleName("gwt-HorizontalSplitPanel");
 
@@ -409,17 +430,16 @@ public MyHorizontalSplitPanel() {
   }
 
   /**
-   * Adds a widget to a pane in the HorizontalSplitPanel. The method
-   * will first attempt to add the widget to the left pane. If a 
-   * widget is already in that position, it will attempt to add the
-   * widget to the right pane. If a widget is already in that position,
-   * an exception will be thrown, as a HorizontalSplitPanel can
-   * contain at most two widgets.
+   * Adds a widget to a pane in the HorizontalSplitPanel. The method will first
+   * attempt to add the widget to the left pane. If a widget is already in that
+   * position, it will attempt to add the widget to the right pane. If a widget
+   * is already in that position, an exception will be thrown, as a
+   * HorizontalSplitPanel can contain at most two widgets.
    * 
-   * Note that this method is bidi-sensitive. In an RTL environment,
-   * this method will first attempt to add the widget to the right pane,
-   * and if a widget is already in that position, it will attempt to add
-   * the widget to the left pane.
+   * Note that this method is bidi-sensitive. In an RTL environment, this method
+   * will first attempt to add the widget to the right pane, and if a widget is
+   * already in that position, it will attempt to add the widget to the left
+   * pane.
    * 
    * @param w the widget to be added
    * @throws IllegalStateException
@@ -437,11 +457,10 @@ public MyHorizontalSplitPanel() {
   }
 
   /**
-   * Gets the widget in the pane that is at the end of the line
-   * direction for the layout. That is, in an RTL layout, gets
-   * the widget in the left pane, and in an LTR layout, gets
-   * the widget in the right pane.
-   *
+   * Gets the widget in the pane that is at the end of the line direction for
+   * the layout. That is, in an RTL layout, gets the widget in the left pane,
+   * and in an LTR layout, gets the widget in the right pane.
+   * 
    * @return the widget, <code>null</code> if there is not one.
    */
   public Widget getEndOfLineWidget() {
@@ -467,11 +486,10 @@ public MyHorizontalSplitPanel() {
   }
 
   /**
-   * Gets the widget in the pane that is at the start of the line 
-   * direction for the layout. That is, in an RTL environment, gets
-   * the widget in the right pane, and in an LTR environment, gets
-   * the widget in the left pane.   
-   *
+   * Gets the widget in the pane that is at the start of the line direction for
+   * the layout. That is, in an RTL environment, gets the widget in the right
+   * pane, and in an LTR environment, gets the widget in the left pane.
+   * 
    * @return the widget, <code>null</code> if there is not one.
    */
   public Widget getStartOfLineWidget() {
@@ -479,11 +497,10 @@ public MyHorizontalSplitPanel() {
   }
 
   /**
-   * Sets the widget in the pane that is at the end of the line direction
-   * for the layout. That is, in an RTL layout, sets the widget in
-   * the left pane, and in and RTL layout, sets the widget in the 
-   * right pane.
-   *
+   * Sets the widget in the pane that is at the end of the line direction for
+   * the layout. That is, in an RTL layout, sets the widget in the left pane,
+   * and in and RTL layout, sets the widget in the right pane.
+   * 
    * @param w the widget
    */
   public void setEndOfLineWidget(Widget w) {
@@ -510,12 +527,12 @@ public MyHorizontalSplitPanel() {
  
   /**
    * Moves the position of the splitter.
-   *
-   * This method is not bidi-sensitive. The size specified is always
-   * the size of the left region, regardless of directionality.
-   *
+   * 
+   * This method is not bidi-sensitive. The size specified is always the size of
+   * the left region, regardless of directionality.
+   * 
    * @param pos the new size of the left region in CSS units (e.g. "10px",
-   *             "1em")
+   *          "1em")
    */
   @Override
   public void setSplitPosition(String pos) {
@@ -524,11 +541,10 @@ public MyHorizontalSplitPanel() {
   }
 
   /**
-   * Sets the widget in the pane that is at the start of the line direction
-   * for the layout. That is, in an RTL layout, sets the widget in
-   * the right pane, and in and RTL layout, sets the widget in the
-   * left pane.
-   *
+   * Sets the widget in the pane that is at the start of the line direction for
+   * the layout. That is, in an RTL layout, sets the widget in the right pane,
+   * and in and RTL layout, sets the widget in the left pane.
+   * 
    * @param w the widget
    */
   public void setStartOfLineWidget(Widget w) {
@@ -576,12 +592,12 @@ public MyHorizontalSplitPanel() {
   }
 
   @Override
-  final void onSplitterResize(int x, int y) {
+  void onSplitterResize(int x, int y) {
     impl.onSplitResize(initialLeftWidth + x - initialThumbPos);
   }
 
   @Override
-  final void onSplitterResizeStarted(int x, int y) {
+  void onSplitterResizeStarted(int x, int y) {
     initialThumbPos = x;
     initialLeftWidth = getOffsetWidth(getElement(LEFT));
   }
@@ -603,7 +619,7 @@ public MyHorizontalSplitPanel() {
      * don't work in an absolute positioned DIV.
      */
     DOM.setInnerHTML(splitDiv,
-        "<table class='hsplitter' height='100%' cellpadding='0' "
+        "<table class='gwt-hsplitter' height='100%' cellpadding='0' "
             + "cellspacing='0'><tr><td align='center' valign='middle'>"
             + thumbImage.getHTML());
 
