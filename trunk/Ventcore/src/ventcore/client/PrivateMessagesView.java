@@ -30,7 +30,29 @@ public class PrivateMessagesView extends Composite {
 		privateMessages.add(pm);
 	    split.setTopWidget(createTopTable());
 	}
+	
+	private static boolean Character_isWhitespace(char c) {
+		return c == ' ' || c == '\t';
+	}
 
+	private String getMessageSubject(PrivateMessage pm) {
+		String message = pm.getMessage();
+		int index = message.indexOf("\n");
+		if (index != -1) {
+			message = message.substring(0, index);
+		}
+		if (message.length() > 80) {
+			for (int i = 80; i >= 0; i--) {
+				// FIXME -> submit GWT bug -> Character.isWhitespace undefined!
+				if (Character_isWhitespace(message.charAt(i))) {
+					message = message.substring(0, i);
+					break;
+				}
+			}
+		}
+		return message;
+	}
+	
 	private FlexTable createTopTable() {
 		FlexTable table = new FlexTable();
 		table.setStyleName("list");
@@ -40,7 +62,7 @@ public class PrivateMessagesView extends Composite {
 	    table.getRowFormatter().setStyleName(0, "th");
 	    for (int i = 0; i < privateMessages.size(); i++) {
 	    	PrivateMessage pm = privateMessages.get(i);
-	    	table.setText(i + 1, 0, pm.getMessage());
+	    	table.setText(i + 1, 0, getMessageSubject(pm));
 	    	table.getCellFormatter().setWordWrap(i + 1, 0, false);
 	    	table.setText(i + 1, 1, pm.getFromUser().getNick());
 	    	table.getCellFormatter().setWordWrap(i + 1, 1, false);
