@@ -16,11 +16,11 @@
 package com.google.gwt.user.client.ui;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 
@@ -48,7 +48,7 @@ import com.google.gwt.user.client.Timer;
  * 
  * @see SplitLayoutPanel
  */
-public final class MyVerticalSplitPanel extends SplitPanel {
+public final class MyVerticalSplitPanel extends MySplitPanel {
   /**
    * The default resources used by this widget.
    */
@@ -394,7 +394,7 @@ public final class MyVerticalSplitPanel extends SplitPanel {
      * This first call is simply to try to avoid a jitter effect if possible.
      */
     setSplitPosition(lastSplitPosition);
-    DeferredCommand.addCommand(new Command() {
+    Scheduler.get().scheduleDeferred(new Command() {
       public void execute() {
         setSplitPosition(lastSplitPosition);
       }

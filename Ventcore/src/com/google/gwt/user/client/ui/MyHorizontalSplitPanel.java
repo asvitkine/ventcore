@@ -16,12 +16,12 @@
 package com.google.gwt.user.client.ui;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
 
@@ -41,7 +41,7 @@ import com.google.gwt.user.client.Timer;
  * <li>.gwt-HorizontalSplitPanel hsplitter { the splitter }</li>
  * </ul>
  */
-public final class MyHorizontalSplitPanel extends SplitPanel {
+public final class MyHorizontalSplitPanel extends MySplitPanel {
 	  /**
 	   * The default resources used by this widget.
 	   */
@@ -294,10 +294,10 @@ public final class MyHorizontalSplitPanel extends SplitPanel {
           // before layout completes, the RIGHT element will
           // appear to be blanked out.
           
-          DeferredCommand.addCommand(new Command() {
-            public void execute() {
-              setWidth(panel.getElement(LEFT), "0px");
-            }
+          Scheduler.get().scheduleDeferred(new Command() {
+			  public void execute() {
+	              setWidth(panel.getElement(LEFT), "0px");
+			  }
           });
         } else {
           setWidth(panel.getElement(LEFT), px + "px");
@@ -579,7 +579,7 @@ public final class MyHorizontalSplitPanel extends SplitPanel {
      * possible.
      */
     setSplitPosition(lastSplitPosition);
-    DeferredCommand.addCommand(new Command() {
+    Scheduler.get().scheduleDeferred(new Command() {
       public void execute() {
         setSplitPosition(lastSplitPosition);
       }
