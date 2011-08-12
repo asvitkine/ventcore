@@ -4,11 +4,8 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.SoftReference;
-import java.security.KeyStore;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -55,15 +52,16 @@ public class VentcoreWiredClient extends EventBasedWiredClient {
 
 	public static VentcoreWiredClient createClientFor(final String user, String host, int port) throws Exception {
 		File certificatesFile = new File("/Users/shadowknight/Projects/ventcore/ssl_certs");
-		InputStream in = new FileInputStream(certificatesFile);
-		KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-		ks.load(in, "changeit".toCharArray());
-		in.close();
+		KeyStoreProvider ksp = new KeyStoreProvider(certificatesFile, "changeit");
+		System.out.println("INFO: Getting server SSL certificates...");
+		boolean added = ksp.addCertificatesForServer(host, port);
+		System.out.println("INFO: SSL certificates were " +
+				(added ? "added to" : "already present in") + " keystore file.");
 
 		SSLContext context = SSLContext.getInstance("TLS");
 		String algorithm = TrustManagerFactory.getDefaultAlgorithm();
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
-		tmf.init(ks);
+		tmf.init(ksp.getKeyStore());
 		context.init(null, new TrustManager[] {tmf.getTrustManagers()[0]}, null);
 		SSLSocketFactory factory = context.getSocketFactory();
 		SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
