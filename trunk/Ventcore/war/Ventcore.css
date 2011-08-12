@@ -96,6 +96,10 @@ div#navigation ul li:hover {
     background-image: url(/images/hover.png);
 }
 
+a:focus { 
+    outline: none; 
+}
+
 div.chat_scroll_view {
 	border: 1px solid #d4d4d4;
 	background: #fff;
